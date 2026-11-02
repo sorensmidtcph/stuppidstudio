@@ -1,12 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="da">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <style>body{margin:0}img{max-width:100%}</style>
 <title>Collaborate prototype 4</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
 <style>
 /* Layout: lo-fi greyscale, matched to the Figma wire (node 37:367). Hero title, then one pinned scene:
    the card slides out of the box, lies tilted left of the intro text, and the camera zooms into it until its circle is the Collaborate module. */
@@ -18,6 +18,10 @@
   --white: #FFFFFF;
   --text: #000000;       /* wire variable "tekst" */
   --muted: #A7A7A7;      /* wire: intro text next to the card */
+  --band: #ECECEC;       /* wire 68:207: hero band */
+  --rule: rgba(0, 0, 0, 0.14); /* assumed: the rail line (an image in the wire) */
+  --rail: 83px;          /* wire 68:207: the vertical line right of the chapter nav */
+  --indent: calc(var(--rail) + 41px); /* text starts at x = 124 in the wire */
   --font: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
   --gutter: clamp(16px, 3vw, 44px);
   --cw: min(78vw, 472px, 52vh);   /* card width, 472 px in the wire at 1440 */
@@ -32,8 +36,8 @@ h1, p { margin: 0; }
 .note { background: var(--text); color: var(--white); font-size: 13px; padding-block: 8px; }
 .site { background: var(--chrome); height: 86px; display: flex; align-items: center; }
 .site { position: relative; }
-/* logo circle centred in the 86 x 86 square left of the first line */
-.site .logo { position: absolute; left: calc(23px + env(safe-area-inset-left, 0px)); top: 23px; width: 40px; height: 40px; border-radius: 50%; background: var(--white); z-index: 1; }
+/* logo circle centred in the 83 x 86 square left of the first line (wire: 57 px circle at 13, 15) */
+.site .logo { position: absolute; left: calc(13px + env(safe-area-inset-left, 0px)); top: 15px; width: 57px; height: 57px; border-radius: 50%; background: var(--white); z-index: 1; }
 /* thin white lines as in the wire's header placeholder; positions read off the Figma render */
 .site .ln { position: absolute; background: var(--white); }
 .site .v { top: 0; bottom: 0; width: 1px; }
@@ -45,11 +49,17 @@ h1, p { margin: 0; }
 .site.head { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; }
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 21; background: var(--chrome); }
 
-.hero { padding-block: clamp(56px, 6.5vw, 90px) 12px; display: grid; justify-items: center; text-align: center; }
+/* the rail: one thin line from the header down through the whole page, right of the chapter nav */
+.rail { position: fixed; top: 0; bottom: 0; left: calc(var(--rail) + env(safe-area-inset-left, 0px)); width: 1px; background: var(--rule); z-index: 15; pointer-events: none; }
+
+/* hero: left-aligned on the band, text starts at the wire's x = 124 */
+.hero { position: relative; background: var(--band); padding-block: 70px 24px; padding-left: max(var(--indent), env(safe-area-inset-left, 0px)); display: grid; justify-items: start; text-align: left; }
 .eyebrow { font-weight: 700; font-size: 16px; line-height: 1.1; text-transform: uppercase; letter-spacing: 0.02em; }
-.hero h1 { margin-top: 14px; font-weight: 700; font-size: clamp(2.25rem, 1rem + 4.6vw, 4.75rem); line-height: 1.1; letter-spacing: -0.02em; max-width: 978px; text-wrap: balance; }
-.hero .lead { margin-top: 28px; max-width: 545px; }
-.hero .hint { margin-top: 24px; }
+.hero h1 { margin-top: 12px; font-weight: 700; font-size: clamp(2.25rem, 1rem + 4.6vw, 4.75rem); line-height: 1.1; letter-spacing: -0.02em; max-width: 978px; text-wrap: balance; }
+.hero .lead { margin-top: 24px; max-width: 638px; font-size: 20px; line-height: 1.5; }
+.hero .hint { margin-top: 18px; display: flex; align-items: center; gap: 11px; font-size: 20px; line-height: 1.5; }
+.circ { display: inline-grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: var(--card); font-size: 18px; line-height: 1; flex: none; }
+.hero .back { position: absolute; left: calc(23px + env(safe-area-inset-left, 0px)); top: 18px; }
 
 /* ---------- static layout: everything readable without script or motion ---------- */
 .stage { display: grid; justify-items: center; gap: 48px; padding-block: 24px 0; }
@@ -69,13 +79,13 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .module svg text { fill: var(--white); font-family: var(--font); font-weight: 700; font-size: 32px; }
 .module svg .soft { opacity: 0.55; }
 
-.say { max-width: 441px; padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); color: var(--text); font-weight: 700; font-size: clamp(1.5rem, 1rem + 1.2vw, 2rem); line-height: 1.4; }
+.say { max-width: 475px; padding-inline: max(var(--gutter), env(safe-area-inset-left, 0px)); color: var(--text); font-weight: 400; font-size: clamp(1.125rem, 0.8rem + 0.9vw, 1.5rem); line-height: 1.4; display: grid; gap: 1.4em; }
 
 .module { position: relative; width: 100%; height: max(600px, 100vh); background: var(--card); color: var(--white); overflow: hidden; }
-.module svg { position: absolute; left: 50%; top: 50%; width: var(--mw); height: auto; transform: translate(-50%, -50%); }
-.m-label { position: absolute; top: var(--gutter); left: max(var(--gutter), env(safe-area-inset-left, 0px)); font-weight: 700; font-size: 16px; line-height: 1.4; }
+.module svg { position: absolute; left: calc(50% + var(--rail) / 2); top: 50%; width: var(--mw); height: auto; transform: translate(-50%, -50%); }
+.m-label { position: absolute; top: var(--gutter); left: max(var(--indent), env(safe-area-inset-left, 0px)); font-weight: 700; font-size: 16px; line-height: 1.4; }
 .m-side { position: absolute; top: calc(50% + 48px); width: min(216px, 40vw); display: grid; gap: 10px; }
-.m-side.left { left: max(var(--gutter), env(safe-area-inset-left, 0px)); }
+.m-side.left { left: max(var(--indent), env(safe-area-inset-left, 0px)); }
 .m-side.right { right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
 .m-side p { font-weight: 700; font-size: clamp(1.125rem, 0.9rem + 0.6vw, 1.5rem); line-height: 1.4; margin-bottom: 14px; }
 .bar { height: 11px; background: var(--white); }
@@ -84,14 +94,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .after { padding-block: 72px; color: var(--muted); text-align: center; }
 
 @media (max-width: 760px) {
+  :root { --rail: 0px; --indent: var(--gutter); }
+  .rail, .hero .back { display: none; }
+  .hero { padding-right: max(var(--gutter), env(safe-area-inset-right, 0px)); }
   .m-side { top: 14%; }
   .m-side .bar { height: 8px; }
 }
 
 /* ---------- scroll-driven version, switched on by script when motion is allowed ---------- */
-.is-scrolly .scene { height: 1120vh; margin-top: -8vh; } /* pulls the closed box up closer to "Scroll" */
-.is-scrolly .stage { position: sticky; top: calc(86px + env(safe-area-inset-top, 0px)); height: calc(100vh - 86px - env(safe-area-inset-top, 0px)); display: block; padding: 0; overflow: hidden; }
-.is-scrolly .box { position: absolute; inset: 0; margin: auto; height: calc(var(--cw) * 70 / 55); aspect-ratio: auto; z-index: 2; }
+/* the band carries on behind the top third of the closed box, as in the wire, and scrolls away with the page */
+.is-scrolly .scene {
+  --stage-h: calc(100vh - 86px - env(safe-area-inset-top, 0px));
+  --bh: calc(var(--cw) * 70 / 55);
+  height: 2030vh;
+  background: linear-gradient(var(--band) 0 calc((var(--stage-h) - var(--bh)) / 2 + var(--bh) * 0.36), transparent 0);
+}
+.is-scrolly .stage { position: sticky; top: calc(86px + env(safe-area-inset-top, 0px)); height: var(--stage-h); display: block; padding: 0; overflow: hidden; }
+/* the scene is centred in the area right of the rail */
+.is-scrolly .box { position: absolute; inset: 0; left: var(--rail); margin: auto; height: calc(var(--cw) * 70 / 55); aspect-ratio: auto; z-index: 2; }
 .is-scrolly .cover { will-change: transform; }
 .is-scrolly .sleeve { display: block; position: absolute; inset: -6%; background: var(--box); border-radius: calc(var(--cw) * 0.055); will-change: transform; }
 /* round window in the box, centred on the card's circle by script, so the illustration shows through */
@@ -100,9 +120,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   mask: radial-gradient(circle var(--hole-r, 30%) at var(--hole-x, 50%) var(--hole-y, 50%), transparent 0 99%, #000 100%);
 }
 .is-scrolly .bg { display: block; position: absolute; inset: 0; background: var(--card); z-index: 1; }
-.is-scrolly .say { position: absolute; top: 0; bottom: 0; left: calc(50% + 6vw); width: min(36vw, 441px); max-width: none; padding: 0; display: grid; align-content: center; z-index: 2; }
+.is-scrolly .say { position: absolute; top: 0; bottom: 0; left: calc(50% + min(160px, 9vw)); width: min(36vw, 475px); max-width: none; padding: 0; align-content: center; z-index: 2; }
 .is-scrolly .module { position: absolute; inset: 0; height: auto; z-index: 3; }
-.is-scrolly .steps { display: grid; gap: 2px; position: absolute; left: max(24px, env(safe-area-inset-left, 0px)); top: 50%; transform: translateY(-50%); margin: 0; padding: 0; list-style: none; z-index: 4; }
+.is-scrolly .steps { display: grid; gap: 2px; position: absolute; left: calc(32px + env(safe-area-inset-left, 0px)); top: 50%; transform: translateY(-50%); margin: 0; padding: 0; list-style: none; z-index: 4; }
 /* chapter nav: a dash per chapter, the name shows on hover or keyboard focus, click jumps there */
 .steps button { display: flex; align-items: center; gap: 10px; padding: 6px 8px 6px 0; border: 0; background: none; cursor: pointer; font: 700 13px/1.2 var(--font); color: var(--text); transition: color .25s; }
 .steps .dash { width: 12px; height: 1px; background: currentColor; opacity: .25; transition: opacity .25s, width .25s; }
@@ -114,6 +134,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* outro: the module empties, then card 3 is dealt into the middle of the window */
 .card3 .cover-title { margin-top: auto; }
 .is-scrolly .box3 { z-index: 4; }
+.is-scrolly .boxU { z-index: 3; }
+.bg .m-label { color: var(--white); }
+.is-scrolly .boxS { z-index: 4; }
 
 @media (max-width: 760px) {
   .is-scrolly .say { top: auto; bottom: max(8vh, 48px); left: max(var(--gutter), env(safe-area-inset-left, 0px)); right: max(var(--gutter), env(safe-area-inset-right, 0px)); width: auto; align-content: end; }
@@ -124,18 +147,20 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <body>
 
 
-<div class="site head pad" aria-label="Sitets eksisterende header"><span class="logo"></span><span class="ln v" style="left:calc(86px + env(safe-area-inset-left, 0px))"></span><span class="ln v" style="left:48%"></span><span class="ln v" style="left:52.2%"></span><span class="ln v" style="left:73.4%"></span><span class="ln v" style="left:79.4%"></span><span class="ln h" style="left:79.4%;top:45%"></span><span class="ln h" style="left:0;bottom:0"></span></div>
+<div class="site head pad" aria-label="Sitets eksisterende header"><span class="logo"></span><span class="ln v" style="left:calc(83px + env(safe-area-inset-left, 0px))"></span><span class="ln v" style="left:48.2%"></span><span class="ln v" style="left:52.2%"></span><span class="ln v" style="left:73.5%"></span><span class="ln v" style="left:79.4%"></span><span class="ln v" style="left:97.2%"></span><span class="ln h" style="left:79.4%;top:44px"></span><span class="ln h" style="left:0;bottom:0"></span></div>
+<div class="rail" aria-hidden="true"></div>
 
-<section class="hero pad">
-  <p class="eyebrow">Strategy 2026–2030</p>
-  <h1>No single actor can create major change alone.</h1>
-  <p class="lead">Our strategy for 2026–2030 sets the direction towards our 2050 vision of a world in balance, grounded in architecture, design and conservation.</p>
-  <p class="hint">↓ Scroll</p>
+<section class="hero">
+  <span class="circ back" aria-hidden="true">←</span>
+  <p class="eyebrow">Strategi 2026–2030</p>
+  <h1>Lorem ipsum dolor sit amet, dolor sit ea.</h1>
+  <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+  <p class="hint"><span class="circ" aria-hidden="true">↓</span>Lorem ipsum dolor sit amet</p>
 </section>
 
 <section class="scene" id="scene">
   <div class="stage" id="stage">
-    <div class="bg" id="bg"></div>
+    <div class="bg" id="bg"><p class="m-label" id="uLabel">01:UDFORDRINGEN</p><p class="m-label" id="lLabel">03:LØSNING</p><p class="m-label" id="aLabel">04:AMBITIONEN</p></div>
 
     <div class="box" id="box" aria-hidden="true">
       <div class="cover" id="cover">
@@ -151,32 +176,86 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       <div class="sleeve" id="sleeve"></div>
     </div>
 
-    <p class="say" id="say">That is why our strategy to 2030 is about collaboration. From citizens to leading professionals in our fields.</p>
+    <div class="say" id="say">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud.</p>
+    </div>
+
+    <!-- card 01 is dealt on top of the strategy card, and the text beside it changes -->
+    <div class="box boxU" id="boxU" aria-hidden="true">
+      <div class="cover" id="cardU">
+        <p class="cover-num" id="uNum">01</p>
+        <div class="cover-art" id="uArt"><svg viewBox="190 40 620 440">
+          <path d="M0 260 H337.5"/><path d="M330 260 A170 170 0 0 1 640.9 164.9"/>
+          <path class="head" d="M665.5 201.4 L674.1 142.5 L607.7 187.3 Z"/>
+          <path d="M1000 260 H662.5"/><path d="M670 260 A170 170 0 0 1 359.1 355.1"/>
+          <path class="head" d="M334.5 318.6 L325.9 377.5 L392.3 332.7 Z"/>
+        </svg></div>
+        <p class="cover-title" id="uTitle">UDFORDRINGEN</p>
+      </div>
+    </div>
+    <div class="say" id="say2">
+      <p>Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</p>
+      <p>Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt.</p>
+    </div>
+
+    <!-- the grey field shrinks back into card 02, which is then zoomed into again -->
+    <div class="box boxS" id="boxS" aria-hidden="true">
+      <div class="cover" id="cardS">
+        <p class="cover-num" id="sNum">02</p>
+        <div class="cover-art" id="sArt"><svg viewBox="190 40 620 440">
+          <path d="M0 260 H337.5"/><path d="M330 260 A170 170 0 0 1 640.9 164.9"/>
+          <path class="head" d="M665.5 201.4 L674.1 142.5 L607.7 187.3 Z"/>
+          <path d="M1000 260 H662.5"/><path d="M670 260 A170 170 0 0 1 359.1 355.1"/>
+          <path class="head" d="M334.5 318.6 L325.9 377.5 L392.3 332.7 Z"/>
+        </svg></div>
+        <p class="cover-title" id="sTitle">SAMARBEJDE</p>
+      </div>
+    </div>
 
     <div class="module" id="module">
-      <p class="m-label" id="mLabel">01:COLLABORATION</p>
+      <p class="m-label" id="mLabel">02:SAMARBEJDE</p>
       <svg viewBox="0 0 1000 520" aria-hidden="true">
         <!-- each half is one stroke (line, then half circle) with its arrowhead riding on the tip while it is drawn -->
         <path id="drawA" d="M0 260 H330 A170 170 0 0 1 640.9 164.9"/>
         <path id="headA" class="head" d="M0 -40 L44 0 L0 40 Z" transform="translate(640.9 164.9) rotate(56)"/>
         <path id="drawB" class="soft-later" d="M1000 260 H670 A170 170 0 0 1 359.1 355.1"/>
         <path id="headB" class="head soft-later" d="M0 -40 L44 0 L0 40 Z" transform="translate(359.1 355.1) rotate(-124)"/>
-        <text id="mWord" x="500" y="271" text-anchor="middle">COLLABORATE</text>
       </svg>
-      <div class="m-side left" id="mLeft"><p>Royal Danish Academy</p><span class="bar"></span><span class="bar short"></span></div>
-      <div class="m-side right" id="mRight"><p>Citizens and stakeholders</p><span class="bar"></span><span class="bar short"></span></div>
+    </div>
+
+    <!-- card 03 LØSNING: comes out of the module's grey, is zoomed into, and its grey shrinks into card 04 -->
+    <div class="box box3" id="boxL" aria-hidden="true">
+      <div class="cover" id="cardL">
+        <p class="cover-num" id="lNum">03</p>
+        <div class="cover-art" id="lArt"><svg viewBox="190 40 620 440">
+          <path d="M0 260 H337.5"/><path d="M330 260 A170 170 0 0 1 640.9 164.9"/>
+          <path class="head" d="M665.5 201.4 L674.1 142.5 L607.7 187.3 Z"/>
+          <path d="M1000 260 H662.5"/><path d="M670 260 A170 170 0 0 1 359.1 355.1"/>
+          <path class="head" d="M334.5 318.6 L325.9 377.5 L392.3 332.7 Z"/>
+        </svg></div>
+        <p class="cover-title" id="lTitle">LØSNING</p>
+      </div>
     </div>
 
     <div class="box box3" id="box3" aria-hidden="true">
       <div class="cover card3" id="card3">
-        <p class="cover-title" id="c3Title">CHALLENGES &amp;<br>CONTRIBUTION</p>
+        <p class="cover-num" id="c3Num">04</p>
+        <div class="cover-art" id="c3Art"><svg viewBox="190 40 620 440">
+          <path d="M0 260 H337.5"/><path d="M330 260 A170 170 0 0 1 640.9 164.9"/>
+          <path class="head" d="M665.5 201.4 L674.1 142.5 L607.7 187.3 Z"/>
+          <path d="M1000 260 H662.5"/><path d="M670 260 A170 170 0 0 1 359.1 355.1"/>
+          <path class="head" d="M334.5 318.6 L325.9 377.5 L392.3 332.7 Z"/>
+        </svg></div>
+        <p class="cover-title" id="c3Title">AMBITIONEN</p>
       </div>
     </div>
 
     <ol class="steps" id="steps" aria-label="Kapitler">
-      <li><button type="button" data-t="0"><span class="dash"></span><span class="lab">Strategy</span></button></li>
-      <li><button type="button" data-t="2.6"><span class="dash"></span><span class="lab">Collaborate</span></button></li>
-      <li><button type="button" data-t="9.2"><span class="dash"></span><span class="lab">Challenges &amp; contribution</span></button></li>
+      <li><button type="button" data-t="4.4"><span class="dash"></span><span class="lab">UDFORDRING</span></button></li>
+      <li><button type="button" data-t="7.5"><span class="dash"></span><span class="lab">SAMARBEJDE</span></button></li>
+      <li><button type="button" data-t="13.0"><span class="dash"></span><span class="lab">LØSNING</span></button></li>
+      <li><button type="button" data-t="16.2"><span class="dash"></span><span class="lab">AMBITION</span></button></li>
     </ol>
   </div>
 </section>
@@ -201,11 +280,18 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   var say = $('say'), bg = $('bg'), mod = $('module'), steps = $('steps');
   var narrow = function () { return window.innerWidth < 760; };
 
-  var card3 = $('card3');
-  gsap.set([say, bg, mod, card3, '#c3Title'], { autoAlpha: 0 });
-  /* scale at which card 3 covers the whole scene, so it can stand in for the grey module background */
-  var fill3 = function () { var s = $('stage'); return 1.15 * Math.max(s.clientWidth / card3.offsetWidth, s.clientHeight / card3.offsetHeight); };
-  gsap.set(['#mLabel', '#mLeft', '#mRight', '#mWord'], { autoAlpha: 0 });
+  var card3 = $('card3'), cardU = $('cardU'), cardS = $('cardS'), say2 = $('say2');
+  var cardL = $('cardL');
+  gsap.set(['#uLabel', '#lLabel', '#aLabel', cardL, '#lNum', '#lArt', '#lTitle', say, say2, bg, mod, card3, '#c3Num', '#c3Art', '#c3Title', cardS, '#sNum', '#sArt', '#sTitle'], { autoAlpha: 0 });
+  /* card 01 waits below the window, turned a little, until it is dealt */
+  gsap.set(cardU, { y: function () { return window.innerHeight; }, rotation: 12 });
+  /* scale at which a card covers the whole scene, so it can stand in for the grey field */
+  var fillFor = function (c) { return function () { var s = $('stage'); return 1.2 * Math.max(s.clientWidth / c.offsetWidth, s.clientHeight / c.offsetHeight); }; };
+  var fill3 = fillFor(card3), fillU = fillFor(cardU), fillS = fillFor(cardS), fillL = fillFor(cardL);
+  var restLR = function () { return narrow() ? -6 : -11; };
+  /* each card rests at its own angle, alternating left and right: 01 -4°, 02 +14°, 03 -11°, 04 +6° */
+  var restUR = function () { return narrow() ? -2 : -4; };
+  gsap.set('#mLabel', { autoAlpha: 0 });
   /* the module's illustration is drawn on: lines from the screen edges in to the circle, then the circle, then the arrowheads */
   var drawA = $('drawA'), drawB = $('drawB'), headA = $('headA'), headB = $('headB');
   var LEN = drawA.getTotalLength(), LINE = 330; /* both halves have the same length; the straight part is 330 units */
@@ -233,7 +319,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { aimWindow(); ScrollTrigger.refresh(); });
 
   /* where the card rests next to the text (wire: 15° tilt, centred at about 30% of the width) */
-  var restX = function () { return narrow() ? 0 : -0.2 * window.innerWidth; };
+  var restX = function () { return narrow() ? 0 : -0.22 * window.innerWidth; };
   var restY = function () { return narrow() ? -0.17 * window.innerHeight : 0; };
   var restS = function () { return narrow() ? 0.7 : 1; };
   var restR = function () { return narrow() ? -8 : -15; };
@@ -245,9 +331,11 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   var zoomS = function () { return scaleFor(art); };
   var zoomX = function () { return xFor(art, cover); };
   var zoomY = function () { return yFor(art, cover); };
-  var rest3R = function () { return narrow() ? 6 : 12; };
+  var rest3R = function () { return narrow() ? 7 : 14; };
+  var rest4R = function () { return narrow() ? 3 : 6; }; /* card 04 leans the other way from card 02 */
 
-  var stepAt = [1.3, 7.3];
+  /* chapter boundaries on the timeline: card 1 + intro, the module, card 3, then the end of the scene */
+  var stepAt = [6.1, 11.8, 15.0];
   var tl = gsap.timeline({
     defaults: { ease: 'power2.inOut' },
     scrollTrigger: {
@@ -259,7 +347,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         var t = tl.time(), n = 0;
         while (n < stepAt.length && t > stepAt[n]) n++;
         Array.prototype.forEach.call(steps.children, function (li, i) { li.classList.toggle('on', i === n); });
-        steps.classList.toggle('on-grey', t > 4.6 && t < 8.3);
+        steps.classList.toggle('on-grey', (t > 5.8 && t < 6.6) || (t > 8.7 && t < 12.3) || (t > 14.2 && t < 15.1) || t > 17.2);
   }
 
   /* 1-2. the box is pulled up and away, so the card comes out of its bottom edge */
@@ -268,31 +356,63 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* 3. the card lies down to the left, the intro text arrives on the right */
     .to(cover, { x: restX, y: restY, scale: restS, rotation: restR, duration: 1, ease: 'power3.out' }, 1.3)
     .fromTo(say, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 2.0)
-    .to({}, { duration: 1 }, 2.5)
-  /* 4. the text leaves and the camera zooms into the card */
-    .to(say, { autoAlpha: 0, y: -20, duration: 0.3 }, 3.5)
-    .to(cover, { x: zoomX, y: zoomY, scale: zoomS, rotation: 0, duration: 1.4, ease: 'power3.in' }, 3.6)
-    .to(['#coverNum', '#coverTitle', '#coverArt'], { autoAlpha: 0, duration: 0.5, ease: 'none' }, 3.8)
-    .to(bg, { autoAlpha: 1, duration: 0.5, ease: 'none' }, 4.4)
-  /* 5. the card's circle is now the module's circle */
-    .set(mod, { autoAlpha: 1 }, 5.0)
-    .set(cover, { autoAlpha: 0 }, 5.0)
-  /* the lines run in from the screen edges with the arrows on their tips; once they are fully in, the half circles are drawn */
-    .to(prog, { d: LINE, duration: 0.6, ease: 'power1.inOut', onUpdate: drawAll }, 5.0)
-    .to(prog, { d: LEN, duration: 0.6, ease: 'power1.out', onUpdate: drawAll }, 5.65)
-    .to('.soft-later', { opacity: 0.55, duration: 0.3, ease: 'none' }, 6.25)
-    .fromTo('#mWord', { autoAlpha: 0, scale: 0.9, transformOrigin: '50% 50%' }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: 'power2.out' }, 6.25)
-    .to(['#mLabel', '#mLeft', '#mRight'], { autoAlpha: 1, duration: 0.3, stagger: 0.08 }, 6.4)
-    .to({}, { duration: 0.6 }, 6.6)
-  /* 6. outro: the module's texts and illustration leave first */
-    .to(['#mLabel', '#mLeft', '#mRight', '#mWord'], { autoAlpha: 0, duration: 0.3 }, 7.2)
-    .to('#module svg', { autoAlpha: 0, duration: 0.4, ease: 'none' }, 7.35)
-  /* 7. the grey background shrinks into the shape of card 3 (card 3 takes over at full-scene size, same grey) */
-    .set(card3, { autoAlpha: 1, x: 0, y: 0, rotation: 0, scale: fill3 }, 7.8)
-    .set([mod, bg], { autoAlpha: 0 }, 7.8)
-    .to(card3, { scale: 1, rotation: rest3R, duration: 1.2, ease: 'power3.inOut' }, 7.8)
-    .to('#c3Title', { autoAlpha: 1, duration: 0.4, ease: 'none' }, 8.8)
-    .to({}, { duration: 1 }, 9.2);
+    .to({}, { duration: 0.5 }, 2.5)
+  /* 4. card 01 UDFORDRINGEN is dealt on top of the strategy card, and the text beside it changes */
+    .to(say, { autoAlpha: 0, y: -20, duration: 0.3 }, 3.0)
+    .to(cardU, { x: restX, y: restY, scale: restS, rotation: restUR, duration: 0.9, ease: 'power3.out' }, 3.0)
+    .fromTo(say2, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power2.out' }, 3.6)
+    .to({}, { duration: 0.8 }, 4.1)
+  /* 5. zoom into card 01 until the window is one grey field */
+    .to(say2, { autoAlpha: 0, y: -20, duration: 0.3 }, 4.9)
+    .to(['#uNum', '#uArt', '#uTitle'], { autoAlpha: 0, duration: 0.4, ease: 'none' }, 5.1)
+    .to(cardU, { x: 0, y: 0, rotation: 0, scale: fillU, duration: 1.1, ease: 'power3.in' }, 5.0)
+    .set(bg, { autoAlpha: 1 }, 6.1)
+    .set('#uLabel', { autoAlpha: 1 }, 6.1) /* the area's label is there as soon as the zoom lands */
+    .set([cardU, cover], { autoAlpha: 0 }, 6.1)
+  /* 6. ... and out again: the grey field shrinks into card 02 SAMARBEJDE */
+    .set(cardS, { autoAlpha: 1, x: 0, y: 0, rotation: 0, scale: fillS }, 6.6)
+    .set(['#uLabel', bg], { autoAlpha: 0 }, 6.6)
+    .to(cardS, { scale: 1, rotation: rest3R, duration: 0.8, ease: 'power3.inOut' }, 6.6)
+    .to(['#sNum', '#sArt', '#sTitle'], { autoAlpha: 1, duration: 0.3, ease: 'none' }, 7.2)
+    .to({}, { duration: 0.6 }, 7.3)
+  /* 7. zoom into card 02 again; the grey becomes the Collaborate module */
+    .to(['#sNum', '#sArt', '#sTitle'], { autoAlpha: 0, duration: 0.3, ease: 'none' }, 7.9)
+    .to(cardS, { rotation: 0, scale: fillS, duration: 1.0, ease: 'power3.in' }, 8.0)
+    .set(bg, { autoAlpha: 1 }, 9.0)
+    .set(mod, { autoAlpha: 1 }, 9.0)
+    .set(cardS, { autoAlpha: 0 }, 9.0)
+  /* 8. the lines run in from the screen edges with the arrows on their tips; once they are fully in, the half circles are drawn */
+    .to(prog, { d: LINE, duration: 0.6, ease: 'power1.inOut', onUpdate: drawAll }, 9.0)
+    .to(prog, { d: LEN, duration: 0.6, ease: 'power1.out', onUpdate: drawAll }, 9.65)
+    .to('.soft-later', { opacity: 0.55, duration: 0.3, ease: 'none' }, 10.25)
+    .to('#mLabel', { autoAlpha: 1, duration: 0.15, ease: 'none' }, 9.0) /* the area's label is there as soon as the zoom lands */
+    .to({}, { duration: 0.6 }, 10.6)
+  /* 9. outro: the module's texts and illustration leave first */
+    .to('#mLabel', { autoAlpha: 0, duration: 0.3 }, 11.2)
+    .to('#module svg', { autoAlpha: 0, duration: 0.4, ease: 'none' }, 11.35)
+  /* 10. the grey background shrinks into card 03 LØSNING (the card takes over at full-scene size, same grey) */
+    .set(cardL, { autoAlpha: 1, x: 0, y: 0, rotation: 0, scale: fillL }, 11.8)
+    .set([mod, bg], { autoAlpha: 0 }, 11.8)
+    .to(cardL, { scale: 1, rotation: restLR, duration: 1.0, ease: 'power3.inOut' }, 11.8)
+    .to(['#lNum', '#lArt', '#lTitle'], { autoAlpha: 1, duration: 0.3, ease: 'none' }, 12.6)
+    .to({}, { duration: 0.5 }, 12.9)
+  /* 11. zoom into card 03; its grey field shows 03:LØSNING straight away */
+    .to(['#lNum', '#lArt', '#lTitle'], { autoAlpha: 0, duration: 0.3, ease: 'none' }, 13.4)
+    .to(cardL, { rotation: 0, scale: fillL, duration: 1.0, ease: 'power3.in' }, 13.5)
+    .set([bg, '#lLabel'], { autoAlpha: 1 }, 14.5)
+    .set(cardL, { autoAlpha: 0 }, 14.5)
+  /* 12. ... and out again: the grey field shrinks into card 04 AMBITIONEN */
+    .set(card3, { autoAlpha: 1, x: 0, y: 0, rotation: 0, scale: fill3 }, 15.0)
+    .set(['#lLabel', bg], { autoAlpha: 0 }, 15.0)
+    .to(card3, { scale: 1, rotation: rest4R, duration: 0.8, ease: 'power3.inOut' }, 15.0)
+    .to(['#c3Num', '#c3Art', '#c3Title'], { autoAlpha: 1, duration: 0.3, ease: 'none' }, 15.6)
+    .to({}, { duration: 0.5 }, 15.9)
+  /* 13. zoom into card 04; its grey field shows 04:AMBITIONEN straight away */
+    .to(['#c3Num', '#c3Art', '#c3Title'], { autoAlpha: 0, duration: 0.3, ease: 'none' }, 16.4)
+    .to(card3, { rotation: 0, scale: fill3, duration: 1.0, ease: 'power3.in' }, 16.5)
+    .set([bg, '#aLabel'], { autoAlpha: 1 }, 17.5)
+    .set(card3, { autoAlpha: 0 }, 17.5)
+    .to({}, { duration: 1 }, 17.5);
 
   /* clicking a chapter scrolls to the moment in the timeline where that chapter is at rest */
   Array.prototype.forEach.call(steps.querySelectorAll('button'), function (b) {
