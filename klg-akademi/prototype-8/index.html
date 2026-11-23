@@ -1,4 +1,8 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1"><style>:root{color-scheme:light}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Strategi prototype 8</title>
+<script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; window.scrollTo(0, 0); /* Søren, 19 Nov: every load starts at the top, with the box */
+if (/[?&]view=mobilframe/.test(location.search)) document.documentElement.classList.add('in-frame'); /* only inside our own mobile frame; the artifact viewer itself is an iframe too */</script>
 <meta name="claude:viewport-fit-sides" content="cover">
 <style>
 /* Akademi Display and Akademi Text, supplied by Søren (Ultralight for the site name, Light, Regular, Semibold, Bold) */
@@ -68,7 +72,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .shortcuts .h-btn:first-child { border-bottom: 1px solid var(--ink); }
 .lang { width: 42px; display: grid; grid-template-rows: 43px 42px; }
 .lang li:first-child { border-bottom: 1px solid var(--ink); }
-.lang a { height: 100%; }
+.lang a { height: 100%; box-sizing: border-box; } /* Søren, 20 Nov: on mobile the 3 px top padding pushed DA out under the header's bottom line */
 .lang a.is-active { background: var(--orange); color: var(--white); }
 
 @media (max-width: 1360px) { .h-name { font-size: 50px; line-height: 50px; letter-spacing: -0.5px; margin-top: 20px; width: auto; } }
@@ -158,7 +162,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 /* the rail continues the right-hand line of the header's logo cell at every width; --rail-x is measured by script */
 /* on the orange table the rail, the chapter lines and the arrow turn white (Søren, 11 Nov) */
-.on-orange .rail { background: var(--white); }
 .on-orange .chapters .dash { background: rgba(255, 255, 255, 0.55); }
 .on-orange .chapters li.on .dash { background: var(--white); }
 .on-orange .chapters .dash::after { border-color: var(--white); }
@@ -166,6 +169,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .on-orange .chapters button:hover .dash { background-color: var(--white); } .on-orange .next-btn:hover { background-color: transparent; color: var(--ink); }
 .rail, .chapters .dash, .next-btn { transition: background-color .3s var(--ease), color .3s var(--ease), border-color .3s var(--ease); }
 .rail { position: fixed; top: 0; bottom: 0; left: var(--rail-x, 85px); width: 1px; background: var(--ink); z-index: 25; pointer-events: none; }
+/* progress on the rail (Søren, 19 Nov): the stretch the reader has scrolled past turns orange; on the orange table it is white over a faint white line */
+.rail-fill { position: absolute; left: 0; top: 0; width: 1px; height: 100%; background: var(--orange); transform-origin: 50% 0; transform: scaleY(var(--p, 0)); transition: background-color .3s var(--ease); } /* 23 Nov: the scroll thickening is dropped again; 1 px */
+.on-orange .rail { background: rgba(255, 255, 255, 0.45); }
+.on-orange .rail-fill { background: var(--white); }
+/* the chapter menu is switched off for now (Søren, 19 Nov). Turn it on again with CHAPTER_MENU = true in the script, or ?kapitler=on in the address */
+.no-chapter-menu .chapters { display: none !important; }
 /* chapter nav, Figma 58:1487 (Søren, 12 Nov): four 8 px squares 24 px apart; grey #8C8A86, the current one orange inside a 16 px orange frame */
 .chapters { position: fixed; left: calc((var(--rail-x, 85px) - 16px) / 2); top: 50%; width: 16px; z-index: 25; }
 .chapters ol { margin: 0; padding: 0; list-style: none; translate: 0 -60px; } /* five chapters (Søren, 12 Nov): 01 is the intro with the cards on the table */
@@ -296,7 +305,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   margin-left: var(--rail-x, 85px); border-top: 1px solid var(--ink); border-left: 1px solid var(--ink); background: var(--white); box-sizing: border-box;
   }
 /* each challenge is shown alone for a while before the next comes up over it. Spacers, not margins: a sticky element's own margin would make it let go too early */
-.challenge-gap { height: 60vh; }
+.challenge-gap { height: 15vh; } /* Søren, 23 Nov: was 60vh, which took about three scrolls before the next challenge started to come up */
 .challenge-title { display: flex; align-items: center; margin: 0; padding: 3px 0 0 32px; border-bottom: 1px solid var(--ink); font: 400 24px/1.1 var(--text); }
 .case { display: grid; grid-template-columns: min(582px, 42%) minmax(0, 1fr); min-height: 0; }
 .case-text { padding: 66px 30px 30px; /* Figma 60:1561: heading 66 px under the tab, no kicker (Søren, 12 Nov) */ display: flex; flex-direction: column; align-items: flex-start; }
@@ -329,9 +338,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .partner-btn { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 72px; box-sizing: border-box; padding: 3px max(24px, env(safe-area-inset-right, 0px)) 0 32px; font: 400 24px/1.1 var(--text); /* Søren, 10 Nov: same size and type as the challenge tabs in chapter 01 */ text-align: left; transition: color .25s var(--ease); }
 .partner-btn:hover { color: var(--orange); }
 .partner.open .partner-btn, .partner.open .partner-panel { background: #FAFAF8; }
+.ico-plus { flex: none; margin-left: 16px; } /* Søren, 23 Nov: a two-line case title squeezed the plus smaller; now it keeps its 24 px */
 .ico-plus .v { transform-box: fill-box; transform-origin: center; transition: transform .3s var(--ease); }
 .partner.open .ico-plus .v { transform: scaleY(0); } /* plus turns into minus */
-.partner-panel { display: grid; grid-template-columns: minmax(0, 883fr) minmax(0, 482fr); grid-template-rows: 665px; align-content: start; height: 666px; border-top: 1px solid var(--ink); } /* fixed row: while the panel folds, the photo and text keep their size and are only clipped, so nothing is laid out again frame by frame */
+/* Søren, 23 Nov: as tall as a challenge (the window under the site header and the tab), with the same photo width and text column, mirrored: photo left, text right */
+.partners { --ph: max(560px, calc(100vh - var(--hh, 85px) - 72px)); }
+.partner-panel { display: grid; grid-template-columns: minmax(0, 1fr) min(582px, 42%); grid-template-rows: calc(var(--ph) - 1px); align-content: start; height: var(--ph); border-top: 1px solid var(--ink); }
 .partner-panel[hidden] { display: none; }
 .partner-panel.anim { overflow: hidden; }
 .partner-panel.anim > * { will-change: opacity; } /* while it folds out or in */
@@ -341,7 +353,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .step-media { position: absolute; inset: 0; background: #D9D4CD; opacity: 0; transition: opacity .8s var(--ease); } /* Søren, 12 Nov: softer cross-fade */
 .step-media.on { opacity: 1; }
 .step-media span { position: absolute; left: 20px; bottom: 16px; font: 600 12px/18px var(--text); letter-spacing: 0.8px; text-transform: uppercase; color: rgba(0, 0, 0, 0.45); }
-.partner-text { display: flex; flex-direction: column; align-items: flex-start; padding: 40px max(24px, env(safe-area-inset-right, 0px)) 27px 30px; }
+.partner-text { display: flex; flex-direction: column; align-items: flex-start; padding: 66px max(24px, env(safe-area-inset-right, 0px)) 30px 30px; } /* 23 Nov: 66 px top, like the challenges' text */
 .partner-kicker { margin: 0; font: 700 14px/1.3 var(--display); text-transform: uppercase; }
 .partner-title { margin: 20px 0 0; max-width: 355px; font: 600 40px/1 var(--display); text-wrap: balance; }
 .partner-body { margin: 16px 0 0; max-width: 394px; font: 400 22px/1.3 var(--display); }
@@ -351,17 +363,25 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .partner-slide { display: flex; flex-direction: column; align-items: flex-start; transition: opacity .45s ease-in-out; } /* Søren, 12 Nov: softer fade between steps (was .2s) */
 .partner-slide.out { opacity: 0; }
 .partner-pager { margin-top: auto; }
+/* "Mere om projektet" from KADK_LP_V2 (20 Nov): a plain text link under the text, styled like the site's text links (assumed) */
+.partner-more { display: inline-block; margin: 24px 0 32px; font: 400 22px/1.3 var(--display); color: var(--ink); text-decoration: none; } /* Søren, 20 Nov: same type as the body text, no underline */
+.partner-more:hover { color: var(--orange); }
+.partner-more:not([hidden]) { animation: pmIn .3s ease-out both; } @keyframes pmIn { from { opacity: 0; } }
+.partner-more[hidden] { display: none; }
 .partner-count { margin: 0 0 16px; font: 400 22px/1.3 var(--display); }
 .partner-arrows { display: flex; gap: 8px; }
 .arrow-btn { width: 48px; height: 48px; display: grid; place-items: center; background: var(--white); box-shadow: inset 0 0 0 1px var(--ink); font: 400 22px/1 var(--display); transition: background-color .25s var(--ease), color .25s var(--ease); }
 .arrow-btn:hover:not(:disabled) { background: var(--orange); color: var(--white); box-shadow: inset 0 0 0 1px var(--orange); }
 .arrow-btn:disabled { opacity: 0.3; cursor: default; }
+/* Søren, 23 Nov: the arrows are drawn as SVG, so they sit dead centre in the 48 px square whatever font is loaded (a text arrow rode on the font's line box) */
+.arrow-btn { padding: 0; line-height: 0; } .arrow-btn .ab-ico { display: block; }
+.m .arrow-btn, .partner-pager .arrow-btn { width: 48px; height: 48px; flex: none; }
 @media (max-width: 900px) {
   .partner-panel { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto; height: auto; }
   .partner-media { aspect-ratio: 883 / 666; }
   .partner-btn { font-size: 22px; height: 64px; }
   .partner-title { font-size: 28px; }
-  .partner-body { font-size: 18px; }
+  .partner-body, .partner-more { font-size: 18px; }
 }
 /* the sheet carries a copy of chapter 01's header block, in exactly the place it has on the page, so label and statement ride up with the white */
 .is-scrolly .world { z-index: 1; }
@@ -379,6 +399,12 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .world2 .card-is02 .frame { opacity: 1; }
 .world2 .card-is02 .art { top: 138px; height: 323px; clip-path: inset(0 16px); } /* Figma: Collaborate illustration at 17, 138; the line stops at the frame, as on the big Udfordringer card */
 .orange-bg { position: absolute; inset: 0; z-index: 0; background: var(--orange); opacity: 0; pointer-events: none; } /* Søren, 11 Nov: the table fades to orange when card 01 opens (tried #E7E3DB in between) */
+/* desktop/mobile view toggle for design work (Søren, 19 Nov); hidden when the page runs inside the mobile frame */
+.view-toggle { position: fixed; right: 16px; bottom: 16px; z-index: 200; display: flex; background: var(--white); border: 1px solid var(--ink); font: 600 12px/1 var(--text); letter-spacing: 0.8px; text-transform: uppercase; }
+.view-toggle a { padding: 10px 14px 9px; color: var(--ink); text-decoration: none; }
+.view-toggle a[aria-current="true"] { background: var(--ink); color: var(--white); }
+.view-toggle a:not([aria-current="true"]):hover { color: var(--orange); }
+.in-frame .view-toggle { display: none; }
 .lift-sheet { display: none; }
 /* ---------- chapter 04 Metode, Figma 60:1709 (Søren, 12 Nov): a white page that slides up over card 03 on the orange table ---------- */
 .ch3 { position: relative; z-index: 2; background: var(--white); padding-bottom: calc(88px * var(--s)); min-height: calc(100vh + 60px); overflow-x: clip; }
@@ -416,7 +442,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .world4 > * { position: absolute; }
 .world4 .card { left: 472px; top: 145px; }
 .world4 .card .frame { opacity: 1; }
-.is-scrolly .scene4 { height: 320vh; margin-top: calc(var(--hh) - 100vh); z-index: 0; }
+.is-scrolly .scene4 { height: 420vh; /* +100vh: card 04 rests one window, then chapter 05 slides up over it */ margin-top: calc(var(--hh) - 100vh); z-index: 0; }
 .is-scrolly .stage4 { position: sticky; top: calc(var(--hh) + env(safe-area-inset-top, 0px)); height: calc(100vh - var(--hh) - env(safe-area-inset-top, 0px)); } /* the line stops at the frame, as on the big cards 01 and 02 */
 .s3-h { margin: 0; left: 886px; top: 376px; width: 412px; font: 600 40px/1.1 var(--display); }
 .s3-p { margin: 0; left: 886px; top: 428px; width: 390px; font: 400 22px/1.3 var(--display); }
@@ -469,7 +495,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .is-scrolly .stake-h { left: 888px; top: 432px; width: 412px; }
 .is-scrolly .stake-p { left: 888px; top: 484px; }
 .is-scrolly .stage { position: sticky; top: calc(var(--hh) + env(safe-area-inset-top, 0px)); margin-top: 0; height: calc(100vh - var(--hh) - env(safe-area-inset-top, 0px)); }
-.is-scrolly .world { transform: none; will-change: transform; }
+.is-scrolly .world { transform: none; }
+/* Søren, 23 Nov (pixelated card in the box): will-change only while things move. With it on all the time, Chrome keeps the card at the size it was first drawn, so zooming in on the box showed it soft and pixelated; when the movement stops, the class goes and the browser redraws everything sharp at the size it now has */
+.is-scrolly.is-moving .world { will-change: transform; }
 .is-scrolly .card-static { display: none; }
 /* the box is one 3D object for the gyro effect; it sits above the chapter cards (z 2) and below the heading */
 .is-scrolly .box { z-index: 3; transform-style: preserve-3d; }
@@ -480,7 +508,178 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     radial-gradient(circle at calc(50% + var(--mx, 0) * 55%) calc(50% + var(--my, 0) * 55%), rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 55%),
     radial-gradient(circle at calc(50% - var(--mx, 0) * 70%) calc(50% - var(--my, 0) * 70%), rgba(40, 30, 20, 0.10), rgba(40, 30, 20, 0) 60%);
   -webkit-mask: url("laag.webp") 0 0 / 520px 640px no-repeat; mask: url("laag.webp") 0 0 / 520px 640px no-repeat; }
-.is-scrolly .lidpart, .is-scrolly #card00, .is-scrolly #card01 { will-change: transform; }
+.is-scrolly.is-moving .lidpart, .is-scrolly.is-moving #card00, .is-scrolly.is-moving #card01 { will-change: transform; }
+
+/* ================= MOBIL (Figma 71:114 "strategy-2026-2030-mobil", Søren 19 Nov) =================
+   html.m is set by script at widths up to 600 px. No rail and no chapter menu; content sits 24 px from the edges. */
+.m .rail, .m .chapters, .m .scroll-hint { display: none !important; }
+.m .next-btn { left: 50%; translate: -50% 0; width: 56px; height: 56px; border: 0 !important; background: transparent; padding: 0; margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+.m .next-btn::before, .m .next-btn::after { display: none; }
+/* header, Figma "Header / Mobil": row 1 is 53 px (logo, name, secondary logo, menu, search), row 2 is 42 px */
+.m .h-logo { width: 53px; height: 53px; padding: 7px; box-sizing: border-box; }
+.m .seal { width: 38px; height: 38px; }
+.m .h-name { margin-top: 8px; }
+.m .h-sec { height: 53px; }
+.m .search-btn { width: 54px; }
+/* chapter intros */
+.m .ch1-head { padding: 48px 24px 32px; }
+.m .ch1-label { font-size: 12px; letter-spacing: 0.5px; }
+.m .ch1-statement { margin-top: 24px; font-size: 32px; line-height: 1.1; letter-spacing: -0.3px; }
+.m .ch1-body, .m .ch1-body.gap-l, .m .ch3 .ch1-body, .m .ch3-mid .ch1-body { margin: 32px 0 0; max-width: none; font-size: 19px; line-height: 1.3; }
+/* chapter 02 Udfordringer: tab rows 60 px, the photo first, then the text */
+.m .challenge-title { padding-left: 24px; font-size: 19px; }
+.m .challenge { border-left: 0; } /* no rail on mobile, so no line at the left edge */
+.m .case-img { order: -1; height: 34vh; min-height: 0; }
+.m .case-text { padding: 28px 24px 24px; }
+.m .case-title { font-size: 30px; line-height: 1; }
+.m .case-body { margin-top: 20px; font-size: 18px; }
+/* chapter 03 Samarbejde: the intro is not pinned; the collage is laid out for 390 px (see script) */
+.m .ch2 .ch1-head { position: static; }
+.m .collage { height: calc(1072px * var(--ms)); margin: 0 !important; clip-path: none; }
+.m .ch2 .partners { margin-top: 0; padding: 32px 0 0; }
+.m .collage-in { width: 390px; height: 1072px; transform: scale(var(--ms)); }
+.m .partner-run { top: 416px; height: 84px; }
+.m .partner-run span { font-size: 38px; line-height: 42px; }
+.m .partner-run .r2 { top: 42px; left: -640px; }
+.m .partners-title { padding: 0 24px; margin-bottom: 32px; font-size: 32px; line-height: 1.1; }
+.m .partner-btn { height: auto; min-height: 60px; padding: 16px 24px 14px; gap: 16px; text-align: left; font-size: 19px; line-height: 1.2; }
+.m .partner-text { padding: 16px 24px 24px; align-items: stretch; }
+/* Søren, 19 Nov: on mobile the pager sits right under the photo, count on the left and arrows on the right */
+.m .partner-pager { order: -1; margin: 0 0 24px; display: flex; align-items: center; justify-content: space-between; }
+.m .partner-count { margin: 0; font-size: 18px; }
+.m .partner-kicker { font-size: 12px; }
+.m .partner-title { margin-top: 24px; font-size: 30px; font-weight: 400; }
+.m .partner-body, .m .partner-more { font-size: 18px; }
+/* chapter 04 Metode: the three cards stacked, full width less 24 px each side */
+.m .ch3-disc { grid-template-columns: minmax(0, 1fr); gap: 16px; margin: 48px 24px 0; }
+.m .ch3-disc figure, .m .ch3-disc figure:first-child, .m .ch3-disc figure:nth-child(3) { margin: 0; }
+.m .ch3-disc figcaption { height: 56px; padding: 18px 0 0 24px; font-size: 19px; }
+.m .ch3-disc .img { aspect-ratio: 340 / 306; }
+.m .ch3-mid { padding: 64px 24px 0; }
+.m .ch3-big { margin: 48px 0 0; aspect-ratio: 390 / 219; }
+.m .ch3 { padding-bottom: 48px; }
+
+/* ---------- site footer (Figma 60:1651 desktop, 73:226 mobile; 23 Nov). Inter in Figma is set in the site's AkademiText here ---------- */
+.site-footer { position: relative; z-index: 3; display: grid; grid-template-columns: 288px minmax(0, 1fr); min-height: 349px; background: var(--white); border-top: 1px solid var(--ink); color: var(--ink); font: 400 16px/22px var(--text); }
+.site-footer p { margin: 0; }
+.site-footer a { color: inherit; text-decoration: none; }
+.site-footer a:hover { color: var(--orange); }
+.f-seal { padding: 30px; border-right: 1px solid var(--ink); }
+.f-seal img { display: block; width: 228px; height: 228px; }
+.f-main { display: flex; flex-direction: column; }
+.f-top { display: grid; grid-template-columns: 1fr 1fr; height: 222px; border-bottom: 1px solid var(--ink); }
+.f-contact { padding: 28px 34px; border-right: 1px solid var(--ink); }
+.f-name { font: 700 22px/26px var(--text); }
+.f-cols { display: flex; gap: 10px; margin-top: 10px; }
+.f-addr { width: 300px; display: flex; flex-direction: column; gap: 10px; }
+.f-news { padding: 28px 34px; }
+.f-news-btn { display: inline-block; padding: 12px 9px 8px; border: 1px solid var(--orange); font: 600 12px/18px var(--text); letter-spacing: 0.8px; text-transform: uppercase; }
+.f-bottom { flex: 1; display: flex; }
+.f-ids { flex: 1; display: flex; align-items: center; gap: 60px; padding: 28px 34px; }
+.f-social { flex: 1; display: flex; align-items: center; gap: 10px; padding: 28px 34px; }
+.f-totop { width: 125px; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-left: 1px solid var(--ink); }
+.f-totop span { font: 200 40px/40px var(--display); }
+@media (max-width: 900px) {
+  .site-footer { display: block; min-height: 0; }
+  .f-seal { padding: 32px 24px 32px; border-right: 0; border-bottom: 1px solid var(--ink); }
+  .f-seal img { width: 120px; height: 120px; }
+  .f-top { display: block; height: auto; }
+  .f-contact { padding: 32px 24px 33px; border-right: 0; border-bottom: 1px solid var(--ink); }
+  .f-cols { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+  .f-addr { display: contents; }
+  .f-addr .f-links { order: 3; }
+  .f-reach { order: 2; }
+  .f-news { padding: 32px 24px 32px; border-bottom: 1px solid var(--ink); }
+  .f-news-btn { padding: 13px 8px 11px; }
+  .f-bottom { display: grid; grid-template-columns: minmax(0, 1fr) 110px; }
+  .f-ids { grid-column: 1 / -1; gap: 64px; padding: 32px 24px; border-bottom: 1px solid var(--ink); }
+  .f-social { padding: 32px 24px; align-items: flex-start; align-content: flex-start; flex-wrap: wrap; gap: 0 10px; }
+  .f-totop { width: auto; height: 118px; }
+}
+/* ---------- chapter 05 Ambitioner, Figma 50:1160 from y 13912 (Søren, 19 Nov): a white page that slides up over card 04, then the call to action on sand ---------- */
+.ch4 { position: relative; z-index: 2; background: var(--white); overflow-x: clip; padding-bottom: 120px; } /* Søren, 20 Nov: 120 px white under the ambitions before the call to action */
+.is-scrolly .ch4 { margin-top: calc(var(--hh) - 100vh); }
+.ch4 .ch1-head { position: static; padding-bottom: 0; }
+.ch4 .ch1-body { margin-top: 40px; }
+.ch4-imgs { position: relative; height: calc(552px * var(--s)); margin-top: 8px; }
+.ch4-imgs figure { position: absolute; margin: 0; background: #D9D4CD; overflow: hidden; }
+.ch4-imgs .a { left: calc(var(--rail-x, 85px) + 30px); top: 0; width: calc(414px * var(--s)); height: calc(485px * var(--s)); }
+.ch4-imgs .b { left: calc(999px * var(--s)); top: calc(327px * var(--s)); width: calc(192px * var(--s)); height: calc(225px * var(--s)); }
+.ch4-imgs img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.amb-h { margin: calc(152px * var(--s)) 0 0; padding: 0 max(16px, env(safe-area-inset-right, 0px)) 0 calc(var(--rail-x, 85px) + 253px * var(--s)); font: 400 clamp(32px, 4.2vw, 60px)/1.1 var(--display); }
+.amb-list { list-style: none; margin: calc(52px * var(--s)) 0 0 var(--rail-x, 85px); padding: 0; border-top: 1px solid var(--ink); }
+.amb-list li { display: grid; grid-template-columns: calc(223px * var(--s)) minmax(0, 626px); align-items: start; min-height: 229px; box-sizing: border-box; padding: 51px 24px 24px 32px; border-bottom: 1px solid var(--ink); }
+.amb-n { margin: 0; font: 200 130px/1.1 var(--display); color: var(--orange); margin-top: -0.12em; }
+.amb-t { margin: 0; align-self: center; } /* Søren, 20 Nov: the text sits in the vertical middle of its row */
+/* KADK_LP_V2 (20 Nov): each ambition has a heading and a body text; the body size is assumed, not from Figma */
+.amb-tt { margin: 0; font: 400 clamp(20px, 1.8vw, 26px)/1.3 var(--display); }
+.amb-b { margin: 12px 0 0; font: 400 18px/1.5 var(--text); }
+.quote { display: grid; grid-template-columns: calc(581px * var(--s)) minmax(0, 1fr); margin-left: var(--rail-x, 85px); }
+.quote-img { aspect-ratio: 581 / 653; background: #D9D4CD; }
+.quote-text { display: flex; flex-direction: column; align-items: flex-start; padding: calc(151px * var(--s)) max(24px, env(safe-area-inset-right, 0px)) 31px calc(42px * var(--s)); }
+.quote-slide { transition: opacity .45s ease-in-out; }
+.quote-slide.out { opacity: 0; }
+.quote-q { margin: 0; max-width: 632px; font: 400 clamp(26px, 2.8vw, 40px)/1.1 var(--display); }
+.quote-who { margin: 16px 0 0; font: 700 14px/1.3 var(--text); text-transform: uppercase; }
+.quote-who span { display: block; font-weight: 400; }
+.quote-pager { margin-top: auto; padding-top: 40px; }
+/* Søren, 20 Nov: the quote module is gone; the call to action lies over the rail and the arrow, so they slide in under it */
+/* Søren, 20 Nov: the white page slides up and uncovers the call to action, which waits pinned at the bottom of the window underneath it */
+.cta { position: sticky; bottom: 0; z-index: 1; background: var(--ground); padding: calc(88px * var(--s)) max(16px, env(safe-area-inset-right, 0px)) calc(152px * var(--s)) calc(var(--rail-x, 85px) + 16px); text-align: center; }
+.cta-h { max-width: 844px; margin: 0 auto; font: 400 clamp(32px, 4.2vw, 60px)/1.1 var(--display); }
+.cta-btns { display: flex; justify-content: center; flex-wrap: wrap; gap: 16px; margin-top: 48px; }
+.cta-btns a { display: inline-block; padding: 19px 15px 15px; font: 400 22px/26px var(--display); text-decoration: none; transition: background-color .25s var(--ease), color .25s var(--ease); }
+.cta-btns .cta-fill { min-width: 315px; box-sizing: border-box; text-align: left; background: var(--orange); color: var(--white); }
+.cta-btns .cta-fill:hover { background: var(--ink); }
+.cta-btns .cta-box { background: var(--white); color: var(--ink); box-shadow: inset 0 0 0 1px var(--orange); }
+.cta-btns .cta-box:hover { background: var(--orange); color: var(--white); }
+.back4 { inset: 0; }
+.world4 .card { position: absolute; }
+/* mobile, Figma 73:179 and 73:219 */
+.m .ch4-imgs { height: calc(448px * var(--ms)); margin-top: 0; }
+.m .ch4-imgs .a { left: 24px; top: 48px; width: calc(217px * var(--ms)); height: calc(254px * var(--ms)); }
+.m .ch4-imgs .b { left: calc(255px * var(--ms)); top: calc(278px * var(--ms)); width: calc(119px * var(--ms)); height: calc(139px * var(--ms)); }
+.m .amb-h { margin-top: 48px; padding: 0 24px; font-size: 32px; }
+.m .amb-list { margin: 32px 0 0; }
+.m .amb-list li { grid-template-columns: 80px minmax(0, 1fr); min-height: 0; padding: 24px 24px 24px 16px; }
+.m .amb-n { font-size: 59px; margin-top: -6px; }
+.m .amb-t { margin-top: 0; } .m .amb-tt { font-size: 19px; } .m .amb-b { font-size: 15px; margin-top: 8px; }
+.m .quote { grid-template-columns: minmax(0, 1fr); margin: 64px 0 0; }
+.m .quote-img { aspect-ratio: 390 / 416; }
+.m .quote-text { padding: 32px 24px 48px; }
+.m .quote-q { font-size: 26px; }
+.m .quote-pager { order: 0; display: block; margin: 0; padding-top: 24px; } /* the quote keeps its pager under the text, as in Figma */
+.m .quote-pager .partner-count { margin-bottom: 16px; }
+.m .cta { padding: 64px 24px 72px; text-align: left; }
+.m .cta-h { font-size: 32px; }
+.m .cta-btns { flex-direction: column; margin-top: 32px; }
+.m .cta-btns { gap: 12px; }
+.m .cta-btns a { min-width: 0; padding: 12px 14px 8px; font-size: 18px; line-height: 22px; } /* Søren, 23 Nov: smaller on mobile, 42 px tall and 18 px text (was 48 px and 22 px) */
+</style>
+<script>
+/* motion fixes from the better-motion review (Søren, 20 Nov). Rollback: ?motion=v1 in the address, or set MOTION_V2 = false here */
+var MOTION_V2 = !/[?&]motion=v1/.test(location.search);
+if (MOTION_V2) document.documentElement.classList.add('motion-v2');
+</script>
+<style>
+/* ---- motion v2 (20 Nov). Everything here sits under html.motion-v2, so ?motion=v1 brings back the old motion ---- */
+/* 1. the site menu slides with transform instead of left (no layout per frame) */
+.motion-v2 .ov { left: 0; transform: translateX(100%); transition: transform .5s var(--ease), visibility 0s .5s; }
+.motion-v2 .ov.open { transform: none; transition: transform .5s var(--ease); }
+/* 2. reduced motion: the menu fades instead of sliding */
+@media (prefers-reduced-motion: reduce) {
+  .motion-v2 .ov { transform: none; opacity: 0; transition: opacity .2s ease-out, visibility 0s .2s; }
+  .motion-v2 .ov.open { opacity: 1; transition: opacity .2s ease-out; }
+}
+/* 3. case text: a quick fade out (150 ms); the new text comes in over 300 ms from 4 px below (set in script) */
+.motion-v2 .partner-slide { transition: opacity .15s ease-out; }
+/* 4. press feedback: 0.96 over 150 ms, never on a disabled button */
+.motion-v2 .arrow-btn { transition: background-color .25s var(--ease), color .25s var(--ease), scale .15s ease-out; }
+.motion-v2 .arrow-btn:not(:disabled):active { scale: 0.96; }
+.motion-v2 .cta-btns a { transition: background-color .25s var(--ease), color .25s var(--ease), scale .15s ease-out; }
+.motion-v2 .cta-btns a:active { scale: 0.96; }
+.motion-v2 .next-btn span { transition: rotate .35s var(--ease), scale .15s ease-out; }
+.motion-v2 .next-btn:active span { scale: 0.96; }
 </style>
 
 <header class="site-header" id="siteHeader">
@@ -618,7 +817,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
 <button type="button" class="next-btn" id="nextBtn" aria-label="Næste del"><span aria-hidden="true">↓</span></button>
 <p class="scroll-hint" id="scrollHint" aria-hidden="true"><span id="scrollHintIn">Scroll for at udforske</span></p>
-<div class="rail" aria-hidden="true"></div>
+<div class="rail" aria-hidden="true"><div class="rail-fill" id="railFill"></div></div>
 <nav class="chapters" aria-label="Kapitler">
   <ol>
     <li class="on"><button type="button" data-chapter="1" aria-current="true"><span class="dash"></span><span class="lab">01 Kortene på bordet</span></button></li>
@@ -629,6 +828,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   </ol>
 </nav>
 
+<nav class="view-toggle" aria-label="Visning"><a href="index.html" aria-current="true" onclick="event.preventDefault(); window.scrollTo(0, 0); location.replace('index.html?r=' + Date.now());">Desktop</a><a href="mobil.html" onclick="event.preventDefault(); location.replace('mobil.html?r=' + Date.now());">Mobil</a></nav> <!-- Søren, 20 Nov: both buttons load the page fresh from the start; the ?r= stamp keeps the browser from reusing a cached copy -->
 <button type="button" class="test-switch" id="testSwitch" role="switch" aria-checked="false" aria-label="Autoplay efter æsken" title="Autoplay efter æsken" hidden><span class="track" aria-hidden="true"></span></button>
 
 <main class="scene" id="scene">
@@ -639,7 +839,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
       <p class="eyebrow hero">Strategi 2026-2030</p>
       <h1 class="title hero">Kortene på bordet</h1>
-      <p class="lead hero">Hvilke spørgsmål holder os vågne om natten? Hvem samarbejder vi med, og hvilket aftryk vil vi sætte? Træd indenfor i vores strategi, og se, hvordan vi spiller vores kort.</p>
+      <p class="lead hero">Hvilke samfundsudfordringer brænder vi for at løse? Hvem samarbejder vi med, og hvilket aftryk vil vi sætte? Træd inden for i vores strategi, og se, hvordan vi spiller vores&nbsp;kort.</p>
 
       <div class="box" id="box" aria-label="Strategiæsken">
         <div class="lid-shadow lidpart"></div>
@@ -682,7 +882,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         <span class="frame"></span>
       </div>
       <div class="card card-01 card-extra" id="card04" aria-label="Kort 04: Ambitioner">
-        <svg class="full" width="496" height="610" viewBox="0 0 496 610" fill="none" aria-hidden="true"><g stroke="#FA4B0B" stroke-width="13" stroke-linejoin="miter"><path d="M0 392H236V299H321V206.5H496"/></g></svg>
+        <svg class="full" width="496" height="610" viewBox="0 0 496 610" fill="none" aria-hidden="true"><!-- Kort_04_AMBITIONER.svg (23 Nov, v3), moved -46/-30 into card space --><g stroke="#FA4B0B" stroke-width="13"><path d="M16 305H138M358 305H480"/><circle cx="248" cy="305" r="110"/><circle cx="248" cy="305" r="60"/></g></svg>
         <p class="num">04</p>
         <p class="name">Ambitioner</p>
         <span class="frame"></span>
@@ -704,7 +904,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         <div class="case-text">
           <h4 class="case-title">Tiden tærer på vores kulturarv</h4>
           <p class="case-body">Svingende luftfugtighed og temperatur får maling til at slå revner og arkæologisk træ til at give efter. Hvordan kan vi bevare arven på en bæredygtig måde?</p>
-          <a class="btn-box arrow" href="#" onclick="return false">Se hvordan</a>
         </div>
         <div class="case-img" aria-hidden="true"><video src="case-01.mp4" autoplay muted loop playsinline preload="auto"></video></div>
       </div>
@@ -716,7 +915,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         <div class="case-text">
           <h4 class="case-title">Hvordan skal vi bo som gamle?</h4>
           <p class="case-body">Hver femte dansker er i dag over 65 år, og mange bliver gamle i boliger, der ikke er tegnet til det. Denne debatbog undersøger udfordringerne – og oplagte løsninger.</p>
-          <a class="btn-box arrow" href="#" onclick="return false">Se hvordan</a>
         </div>
         <div class="case-img"><img src="case-02.jpg" alt="Fælleskøkken med blå køkkenelementer, hvor ældre beboere laver mad sammen"></div>
       </div>
@@ -728,7 +926,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         <div class="case-text">
           <h4 class="case-title">Byggeriets madpyramide</h4>
           <p class="case-body">Alle kender kostpyramiden. Men kan vi lave noget tilsvarende for byggeriet? Ja! Se her, hvilke materialer vi skal bygge med, hvis vi vil bo og bygge sundt.</p>
-          <a class="btn-box arrow" href="#" onclick="return false">Se hvordan</a>
         </div>
         <div class="case-img" aria-hidden="true"><video class="play-in-view" src="case-03.mp4" poster="case-03-poster.jpg" muted loop playsinline preload="metadata"></video></div>
       </div>
@@ -751,21 +948,21 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   <div class="ch1-head">
     <p class="ch1-label">Samarbejde</p>
     <h2 class="ch1-statement" id="ch2Statement">Når fagligheder mødes og væves ind i hinanden, får nysgerrigheden et større spillerum og facit kan tage nye former.</h2>
-    <p class="ch1-body gap-l">Vi samarbejder med partnere, hvor projekterne kan få bred og international rækkevidde – og hvor kunstens måder at tænke og skabe på kan åbne døre, som andre metoder ikke når.</p>
+    <p class="ch1-body gap-l">Vi samarbejder med partnere, hvor projekterne kan få bred og international rækkevidde – og hvor den kunstneriske metode kan åbne døre, som andre metoder ikke når.</p>
   </div>
-  <p class="sr-only-p" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);">Partnere: Copenhagen Health Innovation, Realdania, DSB, Skagens Museum, Bevica Fonden, Politiken, Roskilde Festival og Designmuseum Danmark.</p>
+  <p class="sr-only-p" style="position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);">Partnere: Region Hovedstaden, CBS, DTU, Bevica Fonden, Rambøll, Dreyers Fond, DSB, Roskilde Festival og 3DaysofDesign.</p>
   <div class="collage" id="collage" aria-hidden="true">
     <div class="collage-in">
       <figure class="ph" data-speed="1.25" style="left:221px; top:87px; width:191px; height:224px"><img src="collage-2.jpg" alt="" style="object-position: 52% 50%"></figure>
       <figure class="ph" data-speed="0.85" style="left:883px; top:41px; width:302px; height:355px"><img src="collage-1.jpg" alt="" style="object-position: 47% 50%"></figure>
-      <p class="partner-run"><span class="r1">Copenhagen Health Innovation · Realdania · DSB · Skagens Museum · Bevica Fonden · Politiken · Roskilde Festival · Designmuseum Danmark.</span><span class="r2">Copenhagen Health Innovation · Realdania · DSB · Skagens Museum · Bevica Fonden · Politiken · Roskilde Festival · Designmuseum Danmark.</span></p>
+      <p class="partner-run"><span class="r1">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign ·</span><span class="r2">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign ·</span></p>
       <figure class="ph" data-speed="1" style="left:0; top:810px; width:540px; height:633px"><video id="collageVid" src="collage-3.mp4" poster="collage-3-poster.jpg" muted loop playsinline preload="metadata" style="object-position: 45% 50%"></video></figure> <!-- Søren, 12 Nov: the film clip in the big spot, a little smaller (540 x 633, was 632 x 741); the two people moved up right; the smiling portrait and the small clip spot are gone -->
       <figure class="ph" data-speed="1.15" style="left:706px; top:1004px; width:301px; height:353px"><img src="collage-5.jpg" alt="" style="object-position: 40% 50%"></figure> <!-- Søren, 12 Nov: small photo beside the clip, set like Foto 3 next to Foto 1 in Figma (x 706, 194 px lower) -->
     </div>
   </div>
   </div>
   <div class="partners" id="partners">
-    <h2 class="partners-title">Den kunstneriske metode i praksis</h2>
+    <h2 class="partners-title">Det Kongelige Akademi i praksis</h2>
     <div class="partner open">
       <h3 class="partner-h"><button type="button" class="partner-btn" id="pb1" aria-expanded="true" aria-controls="pp1">Patienttøj med fornuft og følelse<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
       <div class="partner-panel" id="pp1" role="region" aria-labelledby="pb1">
@@ -782,37 +979,39 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
           <h4 class="partner-title">Patienttøj med fornuft og følelse</h4>
           <p class="partner-body">Det Kongelige Akademi og Copenhagen Health Innovation bringer designstuderende tæt på patienter, pårørende og sundhedsprofessionelle.</p>
           </div>
+          <a class="partner-more" href="https://kglakademi.dk/da/nyhed/designere-giver-nye-perspektiver-paa-sundhedsvaesenets-udfordringer" target="_blank" rel="noopener">Mere om projektet →</a>
           <div class="partner-pager">
             <p class="partner-count">1/5</p>
             <div class="partner-arrows">
-              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled>←</button>
-              <button type="button" class="arrow-btn next" aria-label="Næste">→</button>
+              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M19 8H1.5M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <button type="button" class="arrow-btn next" aria-label="Næste"><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M1 8H18.5M11.5 1L18.5 8L11.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
             </div>
           </div>
         </div>
       </div>
     </div>
     <div class="partner">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb2" aria-expanded="false" aria-controls="pp2">Design med iværksætterånd<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb2" aria-expanded="false" aria-controls="pp2">Design og arkitektur med iværksætterånd<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
       <div class="partner-panel" id="pp2" role="region" aria-labelledby="pb2" hidden>
         <div class="partner-media" aria-hidden="true">
-          <div class="step-media on"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
+          <div class="step-media on"><img src="iv-1.jpg" alt="En person bøjer en gren til en prototype (Startup Hub, REACT)"></div>
+          <div class="step-media"><img src="iv-2.jpg" alt="Materialeprøver af mycelium fra Mycelium Furniture"></div>
+          <div class="step-media"><img src="iv-3.jpg" alt="Stole fra Bundle Studio"></div>
+          <div class="step-media"><img src="iv-4.jpg" alt="Prototyping-workshop, hvor deltagere holder en papmodel"></div>
+          <div class="step-media"><img src="iv-5.jpg" alt="Studerende i gruppearbejde ved et bord"></div>
         </div>
         <div class="partner-text">
           <div class="partner-slide" aria-live="polite">
-          <p class="partner-kicker">Partner × KADK</p>
-          <h4 class="partner-title">Design med iværksætterånd</h4>
-          <p class="partner-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus, posuere velit aliquet.</p>
+          <p class="partner-kicker">Udfordring</p>
+          <h4 class="partner-title">Design og arkitektur med iværksætterånd</h4>
+          <p class="partner-body">Bæredygtighed kræver nye produkter, men også nye forretninger, der kan bære dem. Hvordan skaber vi en uddannelse, der klæder morgendagens designere og arkitekter på til at skabe begge dele?</p>
           </div>
+          <a class="partner-more" href="https://royaldanishacademy.com/en/programme/strategic-design-entrepreneurship" target="_blank" rel="noopener">Mere om projektet →</a>
           <div class="partner-pager">
-            <p class="partner-count">1/5</p>
+            <p class="partner-count">1/4</p>
             <div class="partner-arrows">
-              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled>←</button>
-              <button type="button" class="arrow-btn next" aria-label="Næste">→</button>
+              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M19 8H1.5M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <button type="button" class="arrow-btn next" aria-label="Næste"><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M1 8H18.5M11.5 1L18.5 8L11.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
             </div>
           </div>
         </div>
@@ -822,23 +1021,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       <h3 class="partner-h"><button type="button" class="partner-btn" id="pb3" aria-expanded="false" aria-controls="pp3">Arkitektur uden benspænd<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
       <div class="partner-panel" id="pp3" role="region" aria-labelledby="pb3" hidden>
         <div class="partner-media" aria-hidden="true">
-          <div class="step-media on"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
+          <div class="step-media on"><img src="ben-1.jpg" alt="Tre personer går på en sti, den midterste i en dragt, der simulerer nedsat syn og bevægelighed"></div>
+          <div class="step-media"><img src="ben-2.jpg" alt="Studerende med bind for øjnene arbejder med materialer"></div>
+          <div class="step-media"><img src="ben-3.jpg" alt="Boliglaboratoriet med modeller i montrer"></div>
+          <div class="step-media"><img src="ben-4.jpg" alt="To personer går over en plads (ArchAge)"></div>
           <div class="step-media"></div>
         </div>
         <div class="partner-text">
           <div class="partner-slide" aria-live="polite">
-          <p class="partner-kicker">Partner × KADK</p>
+          <p class="partner-kicker">Udfordring</p>
           <h4 class="partner-title">Arkitektur uden benspænd</h4>
-          <p class="partner-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus, posuere velit aliquet.</p>
+          <p class="partner-body">Mennesker med handicap har sjældent de samme muligheder for at deltage i samfundet – hverken i byens rum, i kulturlivet eller i deres egen bolig. Hvordan sikrer vi, at arkitekter og designere lærer at skabe omgivelser, hvor alle kan være med?</p>
           </div>
+          <a class="partner-more" href="https://royaldanishacademy.com/en/news/launch-long-term-partnership-promote-equality-and-inclusion-through-architecture-and-universal" target="_blank" rel="noopener">Mere om projektet →</a>
           <div class="partner-pager">
-            <p class="partner-count">1/5</p>
+            <p class="partner-count">1/4</p>
             <div class="partner-arrows">
-              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled>←</button>
-              <button type="button" class="arrow-btn next" aria-label="Næste">→</button>
+              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M19 8H1.5M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <button type="button" class="arrow-btn next" aria-label="Næste"><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M1 8H18.5M11.5 1L18.5 8L11.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
             </div>
           </div>
         </div>
@@ -848,23 +1048,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       <h3 class="partner-h"><button type="button" class="partner-btn" id="pb4" aria-expanded="false" aria-controls="pp4">Huse mod malaria<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
       <div class="partner-panel" id="pp4" role="region" aria-labelledby="pb4" hidden>
         <div class="partner-media" aria-hidden="true">
-          <div class="step-media on"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
+          <div class="step-media on"><img src="mal-1.jpg" alt="Landsbygade i Mtwara, Tanzania, med Star Homes mellem palmer"></div>
+          <div class="step-media"><img src="mal-2.jpg" alt="Østfacade af Star Homes, stregtegning" style="object-fit: contain; background: #fff"></div>
+          <div class="step-media"><img src="mal-3.jpg" alt="Snit A-A af Star Homes, stregtegning" style="object-fit: contain; background: #fff"></div>
+          <div class="step-media"><img src="mal-4.jpg" alt="Stedsanalyse af Star Homes, stregtegning" style="object-fit: contain; background: #fff"></div>
           <div class="step-media"></div>
         </div>
         <div class="partner-text">
           <div class="partner-slide" aria-live="polite">
-          <p class="partner-kicker">Partner × KADK</p>
+          <p class="partner-kicker">Udfordring</p>
           <h4 class="partner-title">Huse mod malaria</h4>
-          <p class="partner-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus, posuere velit aliquet.</p>
+          <p class="partner-body">Malaria, diarré og luftvejsinfektioner koster hvert år mange børneliv i Afrika syd for Sahara, og boligen spiller en stor rolle. Hvordan kan arkitektur hjælpe med at holde børn raske?</p>
           </div>
+          <a class="partner-more" href="https://royaldanishacademy.com/en/news/novel-house-design-cuts-childhood-malaria-44" target="_blank" rel="noopener">Mere om projektet →</a>
           <div class="partner-pager">
-            <p class="partner-count">1/5</p>
+            <p class="partner-count">1/4</p>
             <div class="partner-arrows">
-              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled>←</button>
-              <button type="button" class="arrow-btn next" aria-label="Næste">→</button>
+              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M19 8H1.5M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <button type="button" class="arrow-btn next" aria-label="Næste"><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M1 8H18.5M11.5 1L18.5 8L11.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
             </div>
           </div>
         </div>
@@ -874,23 +1075,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       <h3 class="partner-h"><button type="button" class="partner-btn" id="pb5" aria-expanded="false" aria-controls="pp5">Havet som byggeklods<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
       <div class="partner-panel" id="pp5" role="region" aria-labelledby="pb5" hidden>
         <div class="partner-media" aria-hidden="true">
-          <div class="step-media on"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
-          <div class="step-media"></div>
+          <div class="step-media on"><img src="hav-1.jpg" alt="En hånd holder en tynd algefilm op mod lyset"></div>
+          <div class="step-media"><img src="hav-2.jpg" alt="En maskine knuser skaller ned i en kasse"></div>
+          <div class="step-media"><img src="hav-3.jpg" alt="Plader af biomateriale på riste"></div>
+          <div class="step-media"><img src="hav-4.jpg" alt="En flettet stol af biomateriale"></div>
+          <div class="step-media"><img src="hav-5.jpg" alt="En kvinde ved ophængt tang"></div>
         </div>
         <div class="partner-text">
           <div class="partner-slide" aria-live="polite">
-          <p class="partner-kicker">Partner × KADK</p>
+          <p class="partner-kicker">Udfordring</p>
           <h4 class="partner-title">Havet som byggeklods</h4>
-          <p class="partner-body">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus, posuere velit aliquet.</p>
+          <p class="partner-body">Danske farvande rummer ressourcer, som i dag ikke bliver udnyttet, fx muslingeskaller. Hvordan kan de blive til byggematerialer med et lavt CO₂-aftryk?</p>
           </div>
+          <a class="partner-more" href="https://royaldanishacademy.com/en/news/building-marine-resources-new-research-initiative" target="_blank" rel="noopener">Mere om projektet →</a>
           <div class="partner-pager">
-            <p class="partner-count">1/5</p>
+            <p class="partner-count">1/4</p>
             <div class="partner-arrows">
-              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled>←</button>
-              <button type="button" class="arrow-btn next" aria-label="Næste">→</button>
+              <button type="button" class="arrow-btn prev" aria-label="Forrige" disabled><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M19 8H1.5M8.5 1L1.5 8L8.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
+              <button type="button" class="arrow-btn next" aria-label="Næste"><svg class="ab-ico" width="20" height="16" viewBox="0 0 20 16" fill="none" aria-hidden="true"><path d="M1 8H18.5M11.5 1L18.5 8L11.5 15" stroke="currentColor" stroke-width="1.5"/></svg></button>
             </div>
           </div>
         </div>
@@ -917,8 +1119,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <section class="ch3" id="ch3" aria-labelledby="ch3Statement">
   <div class="ch1-head">
     <p class="ch1-label">Metode</p>
-    <h2 class="ch1-statement" id="ch3Statement">Hvad bidrager vi med? Det er et spørgsmål, alle har godt af at stille sig selv. Som uddannelses- og forskningsinstitution må vi stille det igen og igen, for svaret står aldrig stille.</h2>
-    <p class="ch1-body">Konservering, arkitektur og design – tre discipliner med uendelige spil og kombinationsmuligheder. Uanset hvilket projekt vi arbejder med, er kernen dog den samme: prototypen og det iterative.</p>
+    <h2 class="ch1-statement" id="ch3Statement">Som uddannelses- og forskningsinstitution sætter vi forskningen og den kunstneriske metode i samtale med hinanden. Det er i mødet mellem undren og viden, det sansede og det undersøgte, at vi finder nye indsigter.</h2>
+    <p class="ch1-body">Konservering, arkitektur og design – vi arbejder inden for tre discipliner, hvor der er uendelige muligheder for samspil og kombination. Uanset hvilket projekt vi har hænderne i, er kernen dog den samme: prototypen og det iterative.</p>
   </div>
   <div class="ch3-disc">
     <figure data-speed="0.9"><figcaption>Konservering</figcaption><div class="img"><img src="disc-1.jpg" alt="Konserveringsstuderende arbejder ved et bord"></div></figure>
@@ -935,16 +1137,75 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 <section class="scene4" id="scene4" aria-label="Kort 04: Ambitioner">
   <div class="stage4" id="stage4">
     <div class="world4" id="world4">
+      <div class="back4" id="back4">
       <div class="card card-01" id="is04" aria-label="Kort 04: Ambitioner">
-        <svg class="full" width="496" height="610" viewBox="0 0 496 610" fill="none" aria-hidden="true"><g stroke="#FA4B0B" stroke-width="13" stroke-linejoin="miter"><path d="M0 392H236V299H321V206.5H496"/></g></svg>
+        <svg class="full" width="496" height="610" viewBox="0 0 496 610" fill="none" aria-hidden="true"><!-- Kort_04_AMBITIONER.svg (23 Nov, v3), moved -46/-30 into card space --><g stroke="#FA4B0B" stroke-width="13"><path d="M16 305H138M358 305H480"/><circle cx="248" cy="305" r="110"/><circle cx="248" cy="305" r="60"/></g></svg>
         <p class="num">04</p>
         <p class="name">Ambitioner</p>
         <span class="frame"></span>
+      </div>
       </div>
     </div>
   </div>
 </section>
 
+<section class="ch4" id="ch4" aria-labelledby="ch4Statement">
+  <div class="ch1-head">
+    <p class="ch1-label">Ambitioner</p>
+    <h2 class="ch1-statement" id="ch4Statement">Vi vil være med, når de store problemer skal løses, med nye greb og nye samarbejder.</h2>
+    <p class="ch1-body">På Det Kongelige Akademi tager vi fat på de helt store samfundsudfordringer, helt tæt på mennesket.</p>
+  </div>
+  <div class="ch4-imgs" aria-hidden="true">
+    <figure class="a" data-speed="0.9"><img src="amb-a.jpg" alt=""></figure> <!-- 22 Nov: Lyslab, kglakademi.dk -->
+    <figure class="b" data-speed="1.15"><img src="amb-b.jpg" alt=""></figure> <!-- 22 Nov: flettet kurv, udstillingen The Researchers -->
+  </div>
+  <h3 class="amb-h">Vores ambitioner i praksis</h3>
+  <ol class="amb-list">
+    <li><p class="amb-n" aria-hidden="true">1</p><div class="amb-t"><h4 class="amb-tt">Vi har en klar plads – og vi bruger den</h4><p class="amb-b">I dansk uddannelse og forskning har vi en unik position. Vi bygger videre på generationers viden om arkitektur, design og konservering og sætter den kunstneriske metode i samtale med forskningen.</p></div></li>
+    <li><p class="amb-n" aria-hidden="true">2</p><div class="amb-t"><h4 class="amb-tt">Vi rækker ud over landets grænser</h4><p class="amb-b">Vores uddannelser er anerkendt internationalt, og vores forskning krydser fag og landegrænser. Det åbner døre for både studerende, forskere og samarbejdspartnere.</p></div></li>
+    <li><p class="amb-n" aria-hidden="true">3</p><div class="amb-t"><h4 class="amb-tt">Vi tager fat på de store opgaver – sammen med andre</h4><p class="amb-b">Med borgere og førende aktører i og omkring vores fag arbejder vi med samfundets helt store udfordringer. Vi skaber løsninger, der virker og giver mening for dem, der skal bruge dem.</p></div></li>
+    <li><p class="amb-n" aria-hidden="true">4</p><div class="amb-t"><h4 class="amb-tt">Vi gør en mærkbar forskel</h4><p class="amb-b">Vores samarbejder viser, hvad arkitektur, design og konservering kan betyde for mennesker og samfund. Vores kandidater og medarbejdere bærer ny viden videre ind i virksomheder og organisationer og flytter den praksis, de træder ind i.</p></div></li>
+  </ol>
+</section>
+
+<section class="cta" id="cta" aria-labelledby="ctaH">
+  <h2 class="cta-h" id="ctaH">Ingen skaber forandringer alene. Har du en udfordring, vi skal løse sammen?</h2>
+  <div class="cta-btns">
+    <a class="cta-fill" href="#" data-href="/da/kontakt">Kontakt os om samarbejde →</a>
+    <a class="cta-box" href="#" data-href="/da/strategi.pdf">Download strategi →</a>
+  </div>
+</section>
+
+<!-- site footer, Figma "Footer / Desktop" (60:1651) and "site-footer (mobil, antaget)" (73:226), 23 Nov.
+     Placeholders as in Figma: CVR/EAN numbers, social icons (text for now), and the targets of Find vej / Tilgængelighedserklæring / Cookiesamtykke / nyhedsbrev -->
+<footer class="site-footer" id="siteFooter">
+  <div class="f-seal"><img src="segl.svg" width="228" height="228" alt="Det Kongelige Akademis segl"></div>
+  <div class="f-main">
+    <div class="f-top">
+      <div class="f-contact">
+        <p class="f-name">Det Kongelige Akademi</p>
+        <div class="f-cols">
+          <div class="f-addr">
+            <p>Philip de Langes Allé 10<br>1435 København K</p>
+            <p class="f-links"><a href="#">Find vej →</a><br><a href="#">Tilgængelighedserklæring →</a><br><a href="#">Cookiesamtykke →</a></p>
+          </div>
+          <p class="f-reach"><a href="mailto:info@kglakademi.dk">info@kglakademi.dk</a><br><a href="tel:+4541701500">+45 4170 1500</a></p>
+        </div>
+      </div>
+      <div class="f-news"><a class="f-news-btn" href="#">Tilmeld dig vores nyhedsbrev →</a></div>
+    </div>
+    <div class="f-bottom">
+      <div class="f-ids">
+        <p><b>CVR</b><br>(nummer)</p>
+        <p><b>EAN</b><br>(nummer)</p>
+      </div>
+      <p class="f-social"><a href="#">LinkedIn</a> <a href="#">Instagram</a> <a href="#">Facebook</a></p>
+      <a class="f-totop" id="toTop" href="#"><span aria-hidden="true">↑</span>To top</a>
+    </div>
+  </div>
+</footer>
+
+<script>Array.prototype.forEach.call(document.querySelectorAll('.site-footer a[href="#"]:not(#toTop)'), function (a) { a.addEventListener('click', function (e) { e.preventDefault(); }); }); /* placeholder links: no jump */</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script>
@@ -953,12 +1214,16 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   var $ = function (id) { return document.getElementById(id); };
   var header = $('siteHeader').querySelector('.hdr');
   var s = 1;
+  var isM = window.innerWidth <= 600; /* mobile layout (Figma 71:114) */
+  root.classList.toggle('m', isM);
   function measure() {
+    if ((window.innerWidth <= 600) !== isM) { location.reload(); return; } /* crossing the breakpoint rebuilds the scenes */
     s = Math.min(1, window.innerWidth / 1440);
     root.style.setProperty('--s', s);
+    root.style.setProperty('--ms', window.innerWidth / 390);
     root.style.setProperty('--hh', header.offsetHeight + 'px');
-    /* line up the rail with the logo cell's right border (the border is the cell's last pixel) */
-    root.style.setProperty('--rail-x', (header.querySelector('.h-logo').getBoundingClientRect().right - 1) + 'px');
+    /* line up the rail with the logo cell's right border (the border is the cell's last pixel); no rail on mobile */
+    root.style.setProperty('--rail-x', isM ? '0px' : (header.querySelector('.h-logo').getBoundingClientRect().right - 1) + 'px');
   }
   measure();
   window.addEventListener('resize', measure);
@@ -998,7 +1263,38 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && openId) { var was = openId; setOverlay(null); document.querySelector('[data-ov="' + was + '"]').focus(); } });
 
-  /* page progress on the rail removed (Søren, 11 Nov) */
+  /* motion v2: with reduced motion no video starts on its own; the poster or first frame stays */
+  if (window.MOTION_V2 && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    Array.prototype.forEach.call(document.querySelectorAll('video'), function (v) { v.removeAttribute('autoplay'); v.autoplay = false; v.pause(); });
+  }
+
+  /* chapter menu on/off: false hides it for now (Søren, 19 Nov); ?kapitler=on in the address shows it without changing the file */
+  var CHAPTER_MENU = false;
+  if (/[?&]kapitler=on/.test(location.search)) CHAPTER_MENU = true;
+  document.documentElement.classList.toggle('no-chapter-menu', !CHAPTER_MENU);
+
+  /* page progress on the rail (Søren, 19 Nov): orange from the top down to how far the reader has scrolled */
+  (function () {
+    var fill = document.getElementById('railFill'), max = 1;
+    function measureMax() { max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight); }
+    function paintRail() { fill.style.setProperty('--p', Math.min(1, Math.max(0, window.scrollY / max)).toFixed(4)); }
+    /* Søren, 20 Nov: at the call to action the rail and the arrow slide in under it: both are cut off at its top edge */
+    var ctaEl = document.getElementById('cta'), cta = document.getElementById('ch4'), railEl = fill.parentNode, nb = document.getElementById('nextBtn');
+    function tuckUnder() {
+      var top = cta.getBoundingClientRect().bottom, /* where the white page ends and the call to action shows */ cut = Math.max(0, window.innerHeight - top);
+      var c = cut > 0 ? 'inset(0 -2px ' + cut + 'px -2px)' : ''; /* -2px at the sides: room for the 3 px scroll line */
+      /* the pinned call to action only exists once the white page's bottom edge is in the window; before that it would show through the scenes above */
+      ctaEl.style.visibility = top < window.innerHeight + 2 ? '' : 'hidden';
+      railEl.style.clipPath = c;
+      var nr = nb.getBoundingClientRect(); nb.style.clipPath = cut > 0 ? 'inset(0 0 ' + Math.max(0, nr.bottom - top) + 'px 0)' : '';
+    }
+    window.addEventListener('scroll', tuckUnder, { passive: true }); window.addEventListener('resize', tuckUnder); tuckUnder();
+    measureMax(); paintRail();
+    window.addEventListener('scroll', paintRail, { passive: true });
+    window.addEventListener('resize', function () { measureMax(); paintRail(); });
+    window.addEventListener('load', function () { measureMax(); paintRail(); });
+    if (window.ScrollTrigger) ScrollTrigger.addEventListener('refresh', function () { measureMax(); paintRail(); });
+  })();
 
   /* ---------- the scroll scene ---------- */
   /* partner cases: each panel steps through five texts with the arrows (Figma 60:1620). CHI has its real texts; the other four are placeholder lorem ipsum (Søren, 12 Nov) */
@@ -1018,25 +1314,38 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
         ['Metode', '', 'Den kunstneriske metode vægter sanselighed lige så højt som det praktiske. Gennem observation og samtaler udviklede de studerende prototyper, afprøvede tekstilprøver og fik løbende feedback fra brugere med nedsat syn og hyppige indlæggelser.'],
         ['Løsning', '', 'Blødt, genanvendeligt patienttøj med tydelige kontraster og taktile kvaliteter, der gør det lettere at orientere sig i tøjet og tage det på.']
       ],
-      pp2: filler('Design med iværksætterånd'),
-      pp3: filler('Arkitektur uden benspænd'),
-      pp4: filler('Huse mod malaria'),
-      pp5: filler('Havet som byggeklods')
+      pp2: [["Udfordring", "Design og arkitektur med iværksætterånd", "Bæredygtighed kræver nye produkter, men også nye forretninger, der kan bære dem. Hvordan skaber vi en uddannelse, der klæder morgendagens designere og arkitekter på til at skabe begge dele?"], ["Aktører", "", "Det Kongelige Akademi og Copenhagen Business School i samarbejde samt eksterne samarbejdspartnere, bl.a. DSB, Mary Elizabeths Hospital og Gehl Archictects."], ["Metode", "", "Uddannelsen er bygget op om projektbaserede forløb, hvor studerende fra Det Kongelige Akademi og CBS arbejder i grupper med reelle udfordringer fra virksomheder og organisationer. Her udvikler de konkrete løsninger, hvor cirkulære materialer og bæredygtige forretningsmodeller går hånd i hånd."], ["Resultater", "", "En ny generation af kandidater, der bygger bro mellem design, arkitektur og forretning. De omsætter bæredygtighed til holdbare produkter og forretninger og skaber løsninger på samfundsmæssige udfordringer."]],
+      pp3: [["Udfordring", "Arkitektur uden benspænd", "Mennesker med handicap har sjældent de samme muligheder for at deltage i samfundet – hverken i byens rum, i kulturlivet eller i deres egen bolig. Hvordan sikrer vi, at arkitekter og designere lærer at skabe omgivelser, hvor alle kan være med?"], ["Aktører", "", "Det Kongelige Akademi i et femårigt partnerskab med Bevica Fonden, Rambøll Fonden og Dreyers Fond, i tæt samarbejde med borgere, civilsamfund og eksperter på fagområdet."], ["Metode", "", "Gennem uddannelse, forskning og efteruddannelse arbejder vi med universelt design. Arbejdet spænder fra transformation af historiske bygninger, boliger og byrum til inkluderende møbler, produkter og designprocesser."], ["Mål", "", "Arkitekter og designere, der kan skabe bygninger, byrum og produkter, som alle kan bruge, uanset om man ser, hører eller bevæger sig forskelligt. Samtidig får vi ny viden om, hvordan vi kan gøre eksisterende bygninger mere tilgængelige uden at miste deres historie."]],
+      pp4: [["Udfordring", "Huse mod malaria", "Malaria, diarré og luftvejsinfektioner koster hvert år mange børneliv i Afrika syd for Sahara, og boligen spiller en stor rolle. Hvordan kan arkitektur hjælpe med at holde børn raske?"], ["Aktører", "", "Star Home er udviklet af Det Kongelige Akademi i samarbejde med et internationalt hold af læger, epidemiologer og sundhedsforskere fra Afrika, Europa og Asien, herunder CSK Research Solutions (Tanzania) og University of Oxford (UK)."], ["Metode", "", "Projektet forener arkitekter og sundhedsforskere og afspejler kriterierne fra begge fagområder. Huset er tegnet med fokus på lys, frisk luft og hverdagens behov, men det er også testet på samme måde, som man tester ny medicin."], ["Resultater", "", "I tre år fulgte forskerne børn i 110 huse i det sydlige Tanzania. Børnene fik 44 % mindre malaria, 30 % mindre diarré og 18 % færre luftvejsinfektioner. Samtidig er huset billigere at bygge og udleder langt mindre CO₂ end et traditionelt hus."]],
+      pp5: [["Udfordring", "Havet som byggeklods", "Danske farvande rummer ressourcer, som i dag ikke bliver udnyttet, fx muslingeskaller. Hvordan kan de blive til byggematerialer med et lavt CO₂-aftryk?"], ["Aktører", "", "Projektet ledes af GXN i samarbejde med Det Kongelige Akademi gennem forskningscentret CITA, Decameal, Vilsund Shells, Staticus, DBI og Teknologisk Institut. Projektet støttes af WE BUILD DENMARK."], ["Metode", "", "Projektet forener forskning, design og praksis i arbejdet med at udvikle et nyt biobaseret byggemateriale, der bl.a. er lavet af muslingeskaller. Materialet afprøves i et facademodul i fuld skala, og samtidig undersøger forskerne brandsikkerhed, CO₂-aftryk, genanvendelighed og mulighederne for at producere det i stor skala."], ["Mål", "", "At gøre materialet klar til byggeriet og bane vejen for et cirkulært byggeri med lavt CO₂-aftryk, bygget på ressourcer fra havet."]]
     };
     Array.prototype.forEach.call(document.querySelectorAll('.partner-panel'), function (panel) {
       var steps = data[panel.id]; if (!steps) return;
       var i = 0, slide = panel.querySelector('.partner-slide'), prev = panel.querySelector('.prev'), next = panel.querySelector('.next');
       var media = panel.querySelector('.partner-media'), count = panel.querySelector('.partner-count');
+      var more = panel.querySelector('.partner-more'); if (more) more.hidden = true; /* Søren, 23 Nov: "Mere om projektet" only on the last slide */
       function show(n) {
         i = Math.max(0, Math.min(steps.length - 1, n));
         slide.classList.add('out');
-        setTimeout(function () {
+        var v2 = window.MOTION_V2, still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        function swapMedia() { Array.prototype.forEach.call(media.children, function (m, k) { m.classList.toggle('on', k === i); }); }
+        clearTimeout(slide._t);
+        slide._t = setTimeout(function () {
           slide.querySelector('.partner-kicker').textContent = steps[i][0];
           var ttl = slide.querySelector('.partner-title'); ttl.textContent = steps[i][1]; ttl.hidden = !steps[i][1];
           slide.querySelector('.partner-body').textContent = steps[i][2];
-          slide.classList.remove('out');
-        }, 450);
-        Array.prototype.forEach.call(media.children, function (m, k) { m.classList.toggle('on', k === i); });
+          if (more) more.hidden = i !== steps.length - 1;
+          if (v2) {
+            /* motion v2: the new text comes in over 300 ms, ease-out, from 4 px below; the photo changes in the same beat */
+            swapMedia();
+            slide.style.transition = 'none'; slide.style.translate = still ? '' : '0 4px';
+            void slide.offsetWidth;
+            slide.style.transition = 'opacity .3s ease-out, translate .3s ease-out'; slide.style.translate = '0 0';
+            slide.classList.remove('out');
+            setTimeout(function () { slide.style.transition = ''; }, 320);
+          } else slide.classList.remove('out');
+        }, v2 ? 150 : 450);
+        if (!v2) swapMedia();
         count.textContent = (i + 1) + '/' + steps.length;
         prev.disabled = i === 0; next.disabled = i === steps.length - 1;
       }
@@ -1053,6 +1362,18 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
       var animate = window.gsap && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       var pending = 0;
       function done() { if (--pending <= 0 && window.ScrollTrigger) ScrollTrigger.refresh(); }
+      /* Søren, 20 Nov: a case that opens glides up so its heading sits right under the site header, and the case can be seen from its start.
+         Panels above it that close at the same time are taken off the target, so it lands where the page will be once they are shut */
+      if (!wasOpen) {
+        var shift = 0;
+        Array.prototype.forEach.call(document.querySelectorAll('.partner'), function (p) {
+          if (p !== item && !p.querySelector('.partner-panel').hidden && (p.compareDocumentPosition(item) & Node.DOCUMENT_POSITION_FOLLOWING)) shift += p.querySelector('.partner-panel').offsetHeight;
+        });
+        var hh = document.getElementById('siteHeader').offsetHeight;
+        var target = Math.max(0, item.getBoundingClientRect().top + window.scrollY - shift - hh);
+        if (animate) { var sp = { y: window.scrollY }; gsap.to(sp, { y: target, duration: 0.7, ease: 'power2.inOut', overwrite: true, onUpdate: function () { window.scrollTo(0, sp.y); } }); }
+        else window.scrollTo(0, target);
+      }
       Array.prototype.forEach.call(document.querySelectorAll('.partner'), function (p) {
         var open = p === item && !wasOpen, panel = p.querySelector('.partner-panel'), was = !panel.hidden;
         p.classList.toggle('open', open);
@@ -1075,6 +1396,32 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     });
   });
 
+  Array.prototype.forEach.call(document.querySelectorAll('.cta-btns a'), function (l) { l.addEventListener('click', function (e) { e.preventDefault(); }); }); /* prototype: the buttons don't leave the page */
+  /* quotes: four slides; only the first is in Figma, 2-4 are placeholders (Søren, 19 Nov) */
+  (function () {
+    var q = [
+      ['“Når du står med materialet i hænderne, opdager du ting, ingen model kunne have vist dig”', 'Aroop Ratan Guha', 'Institut for Design'],
+      ['“Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor”', 'Navn Navnesen', 'Institut for Arkitektur'],
+      ['“Integer posuere erat a ante venenatis dapibus, posuere velit aliquet”', 'Navn Navnesen', 'Institut for Konservering'],
+      ['“Maecenas faucibus mollis interdum, nullam quis risus eget urna mollis ornare”', 'Navn Navnesen', 'Institut for Bygningskunst og Teknologi']
+    ];
+    var box = document.getElementById('quote'); if (!box) return;
+    var slide = box.querySelector('.quote-slide'), prev = box.querySelector('.prev'), next = box.querySelector('.next'), count = box.querySelector('.partner-count'), i = 0;
+    function show(n) {
+      i = Math.max(0, Math.min(q.length - 1, n));
+      slide.classList.add('out');
+      setTimeout(function () {
+        slide.querySelector('.quote-q').textContent = q[i][0];
+        slide.querySelector('.quote-who').innerHTML = q[i][1] + '<span>' + q[i][2] + '</span>';
+        slide.classList.remove('out');
+      }, 450);
+      count.textContent = (i + 1) + '/' + q.length;
+      prev.disabled = i === 0; next.disabled = i === q.length - 1;
+    }
+    prev.addEventListener('click', function () { show(i - 1); });
+    next.addEventListener('click', function () { show(i + 1); });
+  })();
+
   var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (reduce || !window.gsap || !window.ScrollTrigger) return; /* static layout = the Figma frame as drawn */
 
@@ -1090,14 +1437,24 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* camera: the world point (720, 480), the box's centre, sits in the middle of the stage on both axes.
      It starts zoomed in so the box fills about 82% of the stage height (or 86% of its width), and zooms out to 1:1 when the cards slide left */
   var zoomBox = function () {
-    var z = Math.min(0.82 * stage.clientHeight / 640, 0.86 * stage.clientWidth / 520) / s;
+    var z = 0.85 * Math.min(0.82 * stage.clientHeight / 640, 0.86 * stage.clientWidth / 520) / s; /* Søren, 20 Nov: the box 15% smaller at the start */
     return Math.max(1, z);
   };
   var cam = { p: 1 }; /* 1 = zoomed on the box, 0 = 1:1 */
+  /* mobile camera, Figma 71:114: the box is 320 of 390 px wide with its centre about 36% down the stage; on the table the cards are 230 px wide */
+  var kT = function () { return 0.0011891 * stage.clientWidth; };   /* 230 / 496 / 390 */
+  var kB = function () { return 0.0015779 * stage.clientWidth; };   /* 320 / 390 / 520 */
+  function renderM() {
+    var W = stage.clientWidth, Hs = stage.clientHeight;
+    var k = kT() + cam.p * (kB() - kT());
+    var cy = Hs / 2 + cam.p * (0.45 * Hs - Hs / 2); /* Søren, 19 Nov: the box sits more in the middle of the screen */
+    world.style.transform = 'translate3d(' + (W / 2 - 720 * k) + 'px,' + (cy - 480 * k) + 'px,0) scale(' + k + ')';
+  }
   function render() {
+    if (isM) return renderM();
     var k = s * (1 + cam.p * (zoomBox() - 1));
     /* horizontally the world's centre (x 720) sits midway between the vertical rail line and the right edge of the window */
-    var railX = parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85;
+    var railX = isM ? 0 : (parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85);
     var tx = (railX + stage.clientWidth) / 2 - 720 * k, ty = stage.clientHeight / 2 - 480 * k;
     world.style.transform = 'translate3d(' + tx + 'px,' + ty + 'px,0) scale(' + k + ')';
   }
@@ -1114,9 +1471,25 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   cover.className = 'intro-cover';
   document.body.appendChild(cover);
   var rail = document.querySelector('.rail');
-  var intro = gsap.timeline();
+  /* Søren, 20 Nov: the intro waits (paused, under the white cover) until the box image and the fonts are in, so a fresh load always shows the whole start.
+     It never waits more than 2.5 s */
+  /* will-change only while moving (see .is-moving): on during the intro and while scrolling, off 250 ms after it stops */
+  var movingT = null;
+  function moving() { root.classList.add('is-moving'); clearTimeout(movingT); movingT = setTimeout(function () { if (!autoTw) root.classList.remove('is-moving'); else moving(); }, 250); }
+  window.addEventListener('scroll', moving, { passive: true });
+  root.classList.add('is-moving');
+  var intro = gsap.timeline({ paused: true, onComplete: moving });
+  (function () {
+    var started = false;
+    function go() { if (started) return; started = true; intro.play(0); }
+    var waits = [new Promise(function (res) { var im = new Image(); im.onload = im.onerror = res; im.src = 'laag.webp'; })];
+    if (document.fonts && document.fonts.ready) waits.push(document.fonts.ready);
+    Promise.all(waits).then(function () { requestAnimationFrame(go); });
+    setTimeout(go, 2500);
+  })();
   intro.fromTo(cover, { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(100% 0% 0% 0%)', duration: 0.9, ease: 'power2.inOut', immediateRender: true, onComplete: function () { cover.remove(); } }, 0)
-    .from([rail, '.chapters', '#nextBtn'], { x: function () { return -(rail.getBoundingClientRect().left + 2); }, duration: 0.9, ease: 'power3.out' }, 1.5) /* comes in once the box is in place; the small chapter lines ride along with it */
+    .from(isM ? [rail, '.chapters'] : [rail, '.chapters', '#nextBtn'], { x: function () { return -(rail.getBoundingClientRect().left + 2); }, duration: 0.9, ease: 'power3.out' }, 1.5)
+    .from(isM ? '#nextBtn' : {}, { autoAlpha: 0, duration: 0.6, ease: 'power1.out', immediateRender: true }, 1.5) /* 23 Nov: on mobile the arrow sits in the middle and can't slide in from the left, so it showed on the white cover; it fades in instead */ /* comes in once the box is in place; the small chapter lines ride along with it */
   /* then the box comes up from below, fading in on the way, and the arrows draw themselves */
     .fromTo(root, { '--rise': 240, '--fade': 0 }, { '--rise': 0, '--fade': 1, duration: 1.4, ease: 'power3.out', immediateRender: true }, 0.35) /* starts while the background is still coming down */
     .to(card00.querySelectorAll('mask .draw'), { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0.65)
@@ -1141,6 +1514,44 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   var rowS = 258 / 496; /* chapter cards 258 wide */
   var rowX = function (i) { return fanX[i]; };
   var rowY = 625 - 480; /* the fan's centre line at y 625, about 80 px of air under the lead text */
+  /* mobile table, Figma 103:362: card centres in screen px from the stage's top left, angles and layering as drawn */
+  var bigS = 1;
+  if (isM) {
+    /* Søren, 19 Nov: the cards gathered closer around the orange one, just under the lead text; on short screens the whole hand shrinks so more of it shows */
+    var fM = function () { return Math.min(1, stage.clientHeight / 746); };
+    var oY = function () { return 346 + 160 * fM(); }; /* Søren, 20 Nov: the pile 16 px lower (was 330) */ /* centre of the orange card, screen px from the stage top */
+    var dX = [-104, -70, 104, 74], dY = [10, 130, -12, 140];
+    var mX = { length: 4 }, mY = { length: 4 };
+    [0, 1, 2, 3].forEach(function (k) {
+      Object.defineProperty(mX, k, { get: function () { return 196 * stage.clientWidth / 390 + dX[k] * fM(); } });
+      Object.defineProperty(mY, k, { get: function () { return oY() + dY[k] * fM(); } });
+    });
+    var toWX = function (sx) { return (sx - stage.clientWidth / 2) / kT(); };
+    var toWY = function (sy) { return (sy - stage.clientHeight / 2) / kT(); };
+    tilt = [-12, 8, 10, -7];
+    fanZ = [1, 2, 1, 2]; /* all under the orange card (the box has z 3) */
+    rowS = fM(); midS = 215 / 230 * fM(); midR = 3; bigS = 266 / 230;
+    rowX = function (i) { return toWX(mX[i]); };
+    four.forEach(function (c, i) { gsap.set(c, { zIndex: fanZ[i] }); });
+  }
+  var fx = function (i) { return isM ? toWX(mX[i]) : fanX[i]; };
+  var fy = function (i) { return isM ? toWY(mY[i]) : rowY + fanY[i]; };
+  /* mobile: the heading block is placed in world units from the Figma screen positions (eyebrow 56, title 85, lead 197 from the stage top) */
+  function placeHeroM() {
+    if (!isM) return;
+    var k = kT(), Hs = stage.clientHeight, W = stage.clientWidth;
+    var wy = function (sy) { return 480 + (sy - Hs / 2) / k; };
+    var put = function (sel, top, w, fs, lh, ls) {
+      var el = document.querySelector(sel);
+      el.style.top = wy(top) + 'px'; el.style.left = (720 - w / 2 / k) + 'px'; el.style.width = (w / k) + 'px';
+      el.style.fontSize = (fs / k) + 'px'; el.style.lineHeight = lh; el.style.letterSpacing = (ls / k) + 'px'; el.style.whiteSpace = 'normal';
+    };
+    /* Søren, 20 Nov: the whole block 16 px higher */
+    put('.eyebrow', 40, 350, 12, '1.1', 0.5);
+    put('.title', 69, 350 * W / 390, 48, '1', -0.7);
+    put('.lead', 181, 336 * W / 390, 18, '1.3', 0);
+  }
+  placeHeroM(); window.addEventListener('resize', placeHeroM);
   gsap.set('.hero', { autoAlpha: 0, y: 40 });
 
   var tl = gsap.timeline({
@@ -1148,6 +1559,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     scrollTrigger: { trigger: '#scene', start: 'top top', end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true }
   });
 
+  if (isM) tl.to('#nextBtn', { autoAlpha: 0, duration: 0.3, ease: 'none' }, 0.1); /* mobile: the arrow belongs to the box only (Figma "Pil ned") */
   gsap.set('#scrollHintIn', { opacity: 0 }); /* "Scroll for at udforske" fades on when the autoplay has reached the cards on the table (see playToTable) */
   tl.to('#scrollHint', { opacity: 0, duration: 0.2, ease: 'none' }, 3.45) /* "Scroll for at udforske" shows at the cards on the table and leaves as soon as the reader scrolls on from there */
   /* 1. the box is pulled up and away, so the card comes out of its bottom edge */
@@ -1155,19 +1567,19 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* 2. the strategy card stays where it is, at the size it came out with */
   /* 3. the strategy card slides down and out while the four chapter cards fan out from under it into a row, the camera zooms out and the heading arrives above the cards */
     .to(cam, { p: 0, duration: 1.0, ease: 'power2.inOut', onUpdate: render }, 1.9)
-    .to(card00, { y: rowY + midY, z: 0, scale: midS, rotation: midR, duration: 1.0, ease: 'power3.out' }, 2.0) /* the strategy card stays and settles in the middle of the fan */
+    .to(card00, { x: function () { return isM ? toWX(196 * stage.clientWidth / 390) : 0; }, y: function () { return isM ? toWY(oY()) : rowY + midY; }, z: 0, scale: midS, rotation: midR, duration: 1.0, ease: 'power3.out' }, 2.0) /* the strategy card stays and settles in the middle of the fan */
     .set(four.slice(0, 2), { autoAlpha: 1 }, 2.0)
     /* 01-02 fan out to the left from under the strategy card; 03-04 lie over it, so they can't come from under it:
        they are dealt in from the right and land on top, overlapping its edge */
-    .fromTo(four.slice(2), { x: function (i) { return fanX[i + 2] + 420; }, y: function (i) { return rowY + fanY[i + 2] + 60; }, scale: rowS, rotation: function (i) { return tilt[i + 2] + 12; }, autoAlpha: 0 },
-      { x: function (i) { return fanX[i + 2]; }, y: function (i) { return rowY + fanY[i + 2]; }, scale: rowS, rotation: function (i) { return tilt[i + 2]; }, autoAlpha: 1, duration: 0.9, stagger: 0.1, ease: 'power3.out', immediateRender: false }, 2.15)
-    .to(four.slice(0, 2), { x: function (i) { return rowX(i); }, y: function (i) { return rowY + fanY[i]; }, scale: rowS, rotation: function (i) { return tilt[i]; }, duration: 1.0, stagger: 0.08, ease: 'power3.out' }, 2.0)
+    .fromTo(four.slice(2), { x: function (i) { return fx(i + 2) + 420; }, y: function (i) { return fy(i + 2) + 60; }, scale: rowS, rotation: function (i) { return tilt[i + 2] + 12; }, autoAlpha: 0 },
+      { x: function (i) { return fx(i + 2); }, y: function (i) { return fy(i + 2); }, scale: rowS, rotation: function (i) { return tilt[i + 2]; }, autoAlpha: 1, duration: 0.9, stagger: 0.1, ease: 'power3.out', immediateRender: false }, 2.15)
+    .to(four.slice(0, 2), { x: function (i) { return fx(i); }, y: function (i) { return fy(i); }, scale: rowS, rotation: function (i) { return tilt[i]; }, duration: 1.0, stagger: 0.08, ease: 'power3.out' }, 2.0)
     .to('.hero', { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08, ease: 'power2.out' }, 2.5)
   /* 4. the heading lifts away, 02-04 leave, 01 UDFORDRINGER takes its place on the left at full size, and the text arrives on the right */
     .to('.hero', { autoAlpha: 0, y: -60, duration: 0.5, stagger: 0.05, ease: 'power2.in' }, 3.5)
     .to([card00].concat(four.slice(1)), { y: function () { return H() + 200; }, rotation: function (i) { return 8 + i * 4; }, duration: 0.9, stagger: 0.06, ease: 'power2.in' }, 3.6)
     .set(card01, { zIndex: 6 }, 3.6) /* card 01 travels over the others to its place on the left */
-    .to(card01, { x: 0, y: 0, scale: 1, rotation: 0, duration: 1.0, ease: 'power2.inOut' }, 3.7) /* Søren, 11 Nov: the card stands in the middle, no text beside it */
+    .to(card01, { x: 0, y: 0, scale: bigS, rotation: 0, duration: 1.0, ease: 'power2.inOut' }, 3.7) /* Søren, 11 Nov: the card stands in the middle, no text beside it */
     .to('#card01 .frame', { opacity: 1, duration: 0.4, ease: 'none' }, 4.6)
     .to('#orangeBg', { opacity: 1, duration: 0.9, ease: 'power1.inOut' }, 3.8) /* the table fades to orange while card 01 comes forward */
     .set('#card01 .art', { clipPath: 'inset(0px 16px 0px 16px)' }, 3.7) /* big on the left the line stops at the frame, as in Figma: cut at once as the card leaves the row */
@@ -1222,8 +1634,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   box.addEventListener('click', playToTable);
   box.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); playToTable(); } });
   /* during autoplay, scrolling further down just lets it run (the wheel is swallowed so it doesn't jerk); scrolling up, a touch or a key stops it */
-  window.addEventListener('wheel', function (e) { if (!autoTw) return; if (e.deltaY > 0) e.preventDefault(); else stopAuto(); }, { passive: false });
-  ['touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function (e) { if (ev === 'keydown' && e.target === box) return; stopAuto(); }, { passive: true }); });
+  window.addEventListener('wheel', function (e) { if (!autoTw) return; if (window.MOTION_V2) { stopAuto(); return; } /* motion v2: any wheel hands the scroll back to the reader, from where the page is now */ if (e.deltaY > 0) e.preventDefault(); else stopAuto(); }, { passive: false });
+  ['touchstart', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function (e) { if (ev === 'keydown' && e.target === box) return; if (isM && ev === 'touchstart') return; /* mobile: a touch during a swipe-snap is swallowed instead */ stopAuto(); }, { passive: true }); });
 
   /* scroll mode: once the reader has scrolled the strategy card out of the box, the page carries on by itself to the cards on the table.
      It fires once on the way down, and again only after the reader has scrolled back up to the closed box */
@@ -1253,7 +1665,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   });
   /* starts as soon as the box has landed (1.8 s into the intro), without waiting for the rest of the intro */
   function autoAfterIntro() { if (autoMode && window.scrollY < scrollFor(0.2)) playToTable(); }
-  if (intro.time() >= 2.5) autoAfterIntro(); else intro.call(autoAfterIntro, null, 2.5); /* once the box has landed and the chapter menu is in */
+  if (intro.time() >= 2.05) autoAfterIntro(); else intro.call(autoAfterIntro, null, 2.05); /* Søren, 19 Nov: as soon as the arrows have drawn themselves on the card in the box */
 
   /* ---------- scene 2: lift chapter 01 off, back to the table, deal card 02 ---------- */
   var stage2 = $('stage2'), world2 = $('world2'), sheet2 = $('liftSheet');
@@ -1282,8 +1694,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 
   function render2() {
     var W = stage2.clientWidth, H = stage2.clientHeight;
-    var k = Math.min(s, H / 880);
-    var railX = parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85;
+    var k = isM ? 0.0013755 * W : Math.min(s, H / 880); /* mobile: the card is 266 of 390 px wide, Figma chapter frames */
+    var railX = isM ? 0 : (parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85);
     world2.style.transform = 'translate(' + ((railX + W) / 2 - 720 * k) + 'px,' + (H / 2 - 450 * k) + 'px) scale(' + k + ')';
   }
   render2();
@@ -1350,10 +1762,20 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* (the faster rise of the whole collage is gone, Søren 12 Nov: it pushed the partner lines into the intro text) */
 
   /* the two partner lines slide opposite ways while the collage passes (Søren, 12 Nov) */
-  gsap.fromTo('.partner-run .r1', { x: 0 }, { x: -900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
-  gsap.fromTo('.partner-run .r2', { x: 0 }, { x: 900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+  gsap.fromTo('.partner-run .r1', { x: 0 }, { x: isM ? -420 : -900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+  gsap.fromTo('.partner-run .r2', { x: 0 }, { x: isM ? 420 : 900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
 
   /* chapter 02: each photo moves at its own speed while the collage scrolls under the header (data-speed: 1 = with the page, above 1 = faster) */
+  /* mobile collage, Figma 72:144-72:153 (390 px units): the two people big at the top, the partner lines, then three small photos */
+  if (isM) {
+    var mPos = { 'collage-1.jpg': [24, 48, 273, 320], 'collage-2.jpg': [234, 552, 140, 165], 'collage-3.mp4': [24, 612, 161, 189], 'collage-5.jpg': [139, 882, 112, 131] };
+    Array.prototype.forEach.call(document.querySelectorAll('#collage .ph'), function (ph) {
+      var m = ph.querySelector('img, video'), key = m && (m.getAttribute('src') || '');
+      var p = mPos[key]; if (!p) return;
+      ph.style.left = p[0] + 'px'; ph.style.top = p[1] + 'px'; ph.style.width = p[2] + 'px'; ph.style.height = p[3] + 'px';
+      ph.dataset.speed = String(1 + (parseFloat(ph.dataset.speed || 1) - 1) * 0.5);
+    });
+  }
   Array.prototype.forEach.call(document.querySelectorAll('#collage .ph'), function (ph) {
     var sp = parseFloat(ph.dataset.speed) || 1;
     if (sp === 1) return;
@@ -1365,8 +1787,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   var stage3 = $('stage3'), world3 = $('world3'), is03 = $('is03');
   function render3() {
     var W = stage3.clientWidth, H = stage3.clientHeight;
-    var k = Math.min(s, H / 880);
-    var railX = parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85;
+    var k = isM ? 0.0013755 * W : Math.min(s, H / 880); /* mobile: the card is 266 of 390 px wide, Figma chapter frames */
+    var railX = isM ? 0 : (parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85);
     world3.style.transform = 'translate(' + ((railX + W) / 2 - 720 * k) + 'px,' + (H / 2 - 450 * k) + 'px) scale(' + k + ')';
   }
   render3();
@@ -1384,6 +1806,18 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     .to(is03, { autoAlpha: 1, scale: 1, y: 0, duration: 1.1, ease: 'power2.out' }, 1.0)
     .to({}, { duration: 0.6 }, 3.5);
 
+  /* card 04 goes back while the Ambitioner page slides up over it; the two photos drift; the quotes step with the arrows (Søren, 19 Nov) */
+  gsap.fromTo('#back4', { autoAlpha: 1, scale: 1, y: 0 }, { autoAlpha: 0, scale: 0.85, y: 40, ease: 'power2.in',
+    scrollTrigger: { trigger: '#ch4', start: 'top bottom', end: 'top 35%', scrub: 0.8, invalidateOnRefresh: true } });
+  Array.prototype.forEach.call(document.querySelectorAll('.ch4-imgs figure'), function (f) {
+    var sp = parseFloat(f.dataset.speed) || 1;
+    gsap.fromTo(f, { y: function () { return (sp - 1) * 500; } }, { y: function () { return -(sp - 1) * 500; }, ease: 'none',
+      scrollTrigger: { trigger: '.ch4-imgs', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.ch4 .ch1-statement, .ch4 .ch1-body, .amb-h, .amb-list li, .cta-h'), function (el) {
+    gsap.from(el, { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' } });
+  });
+
   /* card 03 goes back (fades down and shrinks a little) while the chapter 04 page slides up over it, as cards 01 and 02 do (Søren, 12 Nov) */
   gsap.fromTo('#back3', { autoAlpha: 1, scale: 1, y: 0 }, { autoAlpha: 0, scale: 0.85, y: 40, ease: 'power2.in',
     scrollTrigger: { trigger: '#ch3', start: 'top bottom', end: 'top 35%', scrub: 0.8, invalidateOnRefresh: true } });
@@ -1391,16 +1825,16 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* ---------- scene 4: the Metode page scrolls away, card 04 Ambitioner comes forward on the orange table ---------- */
   var stage4 = $('stage4'), world4 = $('world4'), is04 = $('is04');
   function render4() {
-    var W = stage4.clientWidth, H = stage4.clientHeight, k = Math.min(s, H / 880);
-    var railX = parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85;
+    var W = stage4.clientWidth, H = stage4.clientHeight, k = isM ? 0.0013755 * W : Math.min(s, H / 880);
+    var railX = isM ? 0 : (parseFloat(getComputedStyle(root).getPropertyValue('--rail-x')) || 85);
     world4.style.transform = 'translate(' + ((railX + W) / 2 - 720 * k) + 'px,' + (H / 2 - 450 * k) + 'px) scale(' + k + ')';
   }
   render4(); window.addEventListener('resize', render4);
   gsap.set(is04, { autoAlpha: 0, scale: 0.85, y: -60 });
-  var tl4 = gsap.timeline({ scrollTrigger: { trigger: '#scene4', start: function () { return 'top ' + header.offsetHeight + 'px'; }, end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true } });
+  var tl4 = gsap.timeline({ scrollTrigger: { trigger: '#scene4', start: function () { return 'top ' + header.offsetHeight + 'px'; }, end: 'bottom 200%', scrub: 0.8, invalidateOnRefresh: true } });
   tl4.to({}, { duration: 1.0 }, 0)
     .to(is04, { autoAlpha: 1, scale: 1, y: 0, duration: 1.1, ease: 'power2.out' }, 1.0)
-    .to({}, { duration: 0.6 }, 2.1);
+    .to({}, { duration: 0.6 }, 3.5); /* Søren, 19 Nov: same timeline length as card 03, so it comes and goes at the same points */
 
   /* chapter 04: the three discipline cards drift at slightly different speeds, the big photo moves inside its frame, the texts rise in */
   /* the three discipline cards start stepped down as in Figma (0 / 96 / 192) and gather into one even row as they come up (Søren, 12 Nov) */
@@ -1414,15 +1848,15 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   /* ---------- white chapter elements while the orange table is in view: read off the timelines as they actually play (scrub included) ---------- */
   var ch2el = $('ch2'), curChapter = 0, ch2Bottom = Infinity;
   /* chapter 02's bottom edge in page coordinates, measured on refresh only, so the ticker never forces a layout (that made the accordion stutter) */
-  var ch3Top = Infinity, ch3Bottom = Infinity;
-  function measureCh2Bottom() { ch2Bottom = ch2el.getBoundingClientRect().bottom + window.scrollY; var r3 = $('ch3').getBoundingClientRect(); ch3Top = r3.top + window.scrollY; ch3Bottom = r3.bottom + window.scrollY; }
+  var ch3Top = Infinity, ch3Bottom = Infinity, ch4Top = Infinity;
+  function measureCh2Bottom() { ch2Bottom = ch2el.getBoundingClientRect().bottom + window.scrollY; var r3 = $('ch3').getBoundingClientRect(); ch3Top = r3.top + window.scrollY; ch3Bottom = r3.bottom + window.scrollY; ch4Top = $('ch4').getBoundingClientRect().top + window.scrollY; }
   ScrollTrigger.addEventListener('refresh', measureCh2Bottom); measureCh2Bottom();
   gsap.ticker.add(function () {
     var o = false, t1 = tl.time(), t2 = tl2.time();
     if (t1 > 4.0 && t1 < 6.75) o = true;                                   /* card 01 open, until the white sheet is half up */
     if (stage2.style.visibility !== 'hidden' && t2 > 0.85 && t2 < 4.6) o = true; /* card 02: from the lifted sheet until the next sheet is half up */
     if (window.scrollY + window.innerHeight / 2 > ch2Bottom && window.scrollY + window.innerHeight / 2 < ch3Top) o = true; /* card 03: once chapter 02 has slid more than halfway off, until chapter 04 is halfway up */
-    if (window.scrollY + window.innerHeight / 2 > ch3Bottom) o = true; /* card 05 Ambitioner: once the Metode page has slid more than halfway off */
+    if (window.scrollY + window.innerHeight / 2 > ch3Bottom && window.scrollY + window.innerHeight / 2 < ch4Top) o = true; /* card 05 Ambitioner: once the Metode page has slid more than halfway off */
     if (o !== root.classList.contains('on-orange')) root.classList.toggle('on-orange', o);
     /* current chapter, read off the same positions: 01 Kortene på bordet until card 01 leaves the row, 02 Udfordringer, 03 Samarbejde from card 02, 04 Metode from card 03 */
     var c = 0;
@@ -1451,11 +1885,17 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
     list.push(docTop(document.querySelector('.ch3-disc')) - header.offsetHeight - 40); /* the three disciplines */
     list.push(docTop(document.querySelector('.ch3-mid')) - header.offsetHeight); /* second statement and the big photo */
     list.push(tl4.scrollTrigger.end);                               /* card 04 Ambitioner on the orange table */
+    list.push(docTop($('ch4')) - header.offsetHeight);              /* chapter 05: header */
+    list.push(docTop(document.querySelector('.amb-h')) - header.offsetHeight - 40); /* the four ambitions */
+    list.push(docTop(document.getElementById('siteFooter')) - window.innerHeight); /* the call to action, fully uncovered, just before the footer */
+    list.push(document.documentElement.scrollHeight - window.innerHeight); /* the footer */
     return list;
   }
   var nextBtn = $('nextBtn');
   function nextStop() { var y = window.scrollY, l = stops(); for (var i = 0; i < l.length; i++) if (l[i] > y + 8) return l[i]; return null; }
   function markNext() { var last = nextStop() === null; nextBtn.classList.toggle('to-top', last); nextBtn.setAttribute('aria-label', last ? 'Tilbage til toppen' : 'Næste del'); }
+  /* footer "To top": back to the cards on the table with the fade, like the arrow at the end (23 Nov) */
+  document.getElementById('toTop').addEventListener('click', function (e) { e.preventDefault(); jumpTo(scrollFor(tableT)); });
   nextBtn.addEventListener('click', function () {
     var to = nextStop();
     stopAuto();
@@ -1466,6 +1906,60 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   });
   window.addEventListener('scroll', function () { if (!autoTw) markNext(); }, { passive: true });
   markNext();
+
+  /* ---------- mobile swipe (Søren, 19 Nov): inside the animated scenes one swipe plays on to the next resting point (or back to the previous one);
+     between them, in the text and photos, the page scrolls freely ---------- */
+  if (isM) (function () {
+    function zones() {
+      var acc = $('acc'), gaps = acc.querySelectorAll('.challenge-gap'), hh = header.offsetHeight;
+      var cs = [docTop(acc) - (hh - 1)];
+      for (var i = 0; i < gaps.length - 1; i++) cs.push(docTop(gaps[i]) + gaps[i].offsetHeight - (hh - 1));
+      var st2 = tl2.scrollTrigger;
+      /* [start, end, resting points in between] */
+      return [[0, tl.scrollTrigger.end, [scrollFor(tableT), scrollFor(5.0)]],
+              [cs[0], cs[cs.length - 1], cs.slice(1, -1), 'text'],
+              [st2.start, st2.end, [st2.start + (3.3 / tl2.duration()) * (st2.end - st2.start)]],
+              [tl3.scrollTrigger.start, tl3.scrollTrigger.end, []],
+              [tl4.scrollTrigger.start, tl4.scrollTrigger.end, []]];
+    }
+    function points(z) { /* the scene's own resting points, plus its two ends */
+      return [z[0]].concat(z[2], [z[1]]);
+    }
+    var t0 = null, y0 = 0, mode = null, zs = null, tStart = 0, lastY = 0;
+    function zoneAt(y) { for (var i = 0; i < zs.length; i++) if (y >= zs[i][0] - 8 && y <= zs[i][1] + 8) return zs[i]; return null; }
+    window.addEventListener('touchstart', function (e) {
+      if (autoTw) { mode = 'busy'; return; }
+      t0 = e.touches[0].clientY; y0 = window.scrollY; mode = null; zs = zones(); tStart = Date.now(); lastY = t0;
+    }, { passive: true });
+    window.addEventListener('touchmove', function (e) {
+      if (mode === 'busy' || autoTw) { e.preventDefault(); return; }
+      if (t0 === null || mode === 'free') return;
+      var dy = t0 - e.touches[0].clientY; lastY = e.touches[0].clientY;
+      if (mode === null) {
+        if (Math.abs(dy) < 6) return;
+        var z = zoneAt(y0), down = dy > 0;
+        /* at the bottom edge of a scene a downward swipe, and at its top edge an upward one, scroll on freely */
+        if (!z || (down && y0 >= z[1] - 8) || (!down && y0 <= z[0] + 8 && z[0] > 0)) { mode = 'free'; return; }
+        if (window.MOTION_V2 && z[3] === 'text') { mode = 'free'; return; } /* motion v2: the challenges are reading, so they scroll freely */
+        mode = down ? 'down' : 'up';
+      }
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchend', function () {
+      var m = mode, travel = Math.abs((t0 === null ? lastY : t0) - lastY), took = Math.max(1, Date.now() - tStart); mode = null; t0 = null;
+      /* motion v2: a long, fast swipe (over 40% of the screen at more than 1.2 px/ms) skips one resting point */
+      var skip = window.MOTION_V2 && travel > 0.4 * window.innerHeight && travel / took > 1.2;
+      if (m !== 'down' && m !== 'up') return;
+      var y = window.scrollY, z = zoneAt(y); if (!z) return;
+      var l = points(z), to = null;
+      if (m === 'down') { for (var i = 0; i < l.length; i++) if (l[i] > y + 8) { to = (skip && l[i + 1] !== undefined) ? l[i + 1] : l[i]; break; } }
+      else { for (var j = l.length - 1; j >= 0; j--) if (l[j] < y - 8) { to = (skip && l[j - 1] !== undefined) ? l[j - 1] : l[j]; break; } }
+      if (to === null) return;
+      var pos = { y: y };
+      autoTw = gsap.to(pos, { y: to, duration: Math.min(1.6, Math.max(0.8, Math.abs(to - y) / 900)), ease: 'power2.inOut',
+        onUpdate: function () { window.scrollTo(0, pos.y); }, onComplete: function () { autoTw = null; markNext(); } });
+    }, { passive: true });
+  })();
 
   /* chapter menu: 01 jumps to Udfordringer at rest on the left; 02 jumps to card 02 on the table; 03-04 have no section on the page yet */
   /* Søren, 12 Nov: a chapter click lands directly on the chapter, no scrolling down the page: the window fades to the ground colour,
@@ -1525,7 +2019,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   });
   stage.addEventListener('pointermove', function () { settled = false; }, true);
   var clamp = function (v) { return Math.max(-1, Math.min(1, v)); };
-  stage.addEventListener('pointermove', function (e) {
+  /* Søren, 19 Nov: the gyro (box tilting after the pointer) is switched off; the box stays flat */
+  if (false) stage.addEventListener('pointermove', function (e) {
     if (e.pointerType === 'touch') return;
     var r = box.querySelector('.lid').getBoundingClientRect();
     var reach = Math.max(r.width, r.height) * 0.9;
@@ -1537,3 +2032,5 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(); ScrollTrigger.refresh(); });
 })();
 </script>
+
+</body></html>
