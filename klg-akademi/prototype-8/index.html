@@ -473,7 +473,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* partner lines, Figma 58:1547: two lines of partner names, 60/1, 24 px apart, sliding opposite ways as the page scrolls */
 .partner-run { position: absolute; left: 0; top: 532px; margin: 0; width: 0; height: 144px; }
 .partner-run span { position: absolute; left: 0; white-space: nowrap; font: 400 60px/1 var(--display); will-change: transform; }
-.partner-run .r1 { top: 0; }
+.partner-run .r1 { top: 0; left: calc(var(--rail-x, 85px) + 30px); } /* Søren, 23 Nov: starts in line with the text, so "Region Hovedstaden" is read whole before the line runs out to the left */
 .partner-run .r2 { top: 84px; left: -1853px; }
 .ph img, .ph video { width: 100%; height: 100%; object-fit: cover; display: block; }
 .ph span { position: absolute; left: 12px; bottom: 10px; font: 600 11px/16px var(--text); letter-spacing: 0.8px; text-transform: uppercase; color: rgba(0, 0, 0, 0.45); }
@@ -541,6 +541,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .m .partner-run { top: 416px; height: 84px; }
 .m .partner-run span { font-size: 38px; line-height: 42px; }
 .m .partner-run .r2 { top: 42px; left: -640px; }
+.m .partner-run .r1 { left: 24px; }
 .m .partners-title { padding: 0 24px; margin-bottom: 32px; font-size: 32px; line-height: 1.1; }
 .m .partner-btn { height: auto; min-height: 60px; padding: 16px 24px 14px; gap: 16px; text-align: left; font-size: 19px; line-height: 1.2; }
 .m .partner-text { padding: 16px 24px 24px; align-items: stretch; }
@@ -955,9 +956,9 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     <div class="collage-in">
       <figure class="ph" data-speed="1.25" style="left:221px; top:87px; width:191px; height:224px"><img src="collage-2.jpg" alt="" style="object-position: 52% 50%"></figure>
       <figure class="ph" data-speed="0.85" style="left:883px; top:41px; width:302px; height:355px"><img src="collage-1.jpg" alt="" style="object-position: 47% 50%"></figure>
-      <p class="partner-run"><span class="r1">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign ·</span><span class="r2">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign ·</span></p>
-      <figure class="ph" data-speed="1" style="left:0; top:810px; width:540px; height:633px"><video id="collageVid" src="collage-3.mp4" poster="collage-3-poster.jpg" muted loop playsinline preload="metadata" style="object-position: 45% 50%"></video></figure> <!-- Søren, 12 Nov: the film clip in the big spot, a little smaller (540 x 633, was 632 x 741); the two people moved up right; the smiling portrait and the small clip spot are gone -->
-      <figure class="ph" data-speed="1.15" style="left:706px; top:1004px; width:301px; height:353px"><img src="collage-5.jpg" alt="" style="object-position: 40% 50%"></figure> <!-- Søren, 12 Nov: small photo beside the clip, set like Foto 3 next to Foto 1 in Figma (x 706, 194 px lower) -->
+      <p class="partner-run"><span class="r1">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign ·</span><span class="r2">Region Hovedstaden · CBS · DTU · Bevica Fonden · Rambøll · Dreyers Fond · DSB · Roskilde Festival · 3DaysofDesign</span></p>
+      <figure class="ph" data-speed="0.85" style="left:0; top:810px; width:540px; height:633px"><video id="collageVid" src="collage-3.mp4" poster="collage-3-poster.jpg" muted loop playsinline preload="metadata" style="object-position: 45% 50%"></video></figure> <!-- Søren, 12 Nov: the film clip in the big spot, a little smaller (540 x 633, was 632 x 741); the two people moved up right; the smiling portrait and the small clip spot are gone -->
+      <figure class="ph" data-speed="1.35" style="left:706px; top:1004px; width:301px; height:353px"><img src="collage-5.jpg" alt="" style="object-position: 40% 50%"></figure> <!-- 23 Nov: more parallax between the clip (0.85, was 1) and this photo (1.35, was 1.15) --> <!-- Søren, 12 Nov: small photo beside the clip, set like Foto 3 next to Foto 1 in Figma (x 706, 194 px lower) -->
     </div>
   </div>
   </div>
@@ -1755,8 +1756,18 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   /* (the faster rise of the whole collage is gone, Søren 12 Nov: it pushed the partner lines into the intro text) */
 
   /* the two partner lines slide opposite ways while the collage passes (Søren, 12 Nov) */
-  gsap.fromTo('.partner-run .r1', { x: 0 }, { x: isM ? -420 : -900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
-  gsap.fromTo('.partner-run .r2', { x: 0 }, { x: isM ? 420 : 900, ease: 'none', scrollTrigger: { trigger: '#collage', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+  /* Søren, 23 Nov: the two lines move while the belt itself crosses the window (was: the whole collage), so line 1 comes in with "Region Hovedstaden" whole and only then runs out to the left */
+  gsap.fromTo('.partner-run .r1', { x: 0 }, { x: isM ? -360 : -700, ease: 'none', scrollTrigger: { trigger: '.partner-run', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+  gsap.fromTo('.partner-run .r2', { x: 0 }, { x: isM ? 360 : 700, ease: 'none', scrollTrigger: { trigger: '.partner-run', start: 'top bottom', end: 'bottom top', scrub: 1, invalidateOnRefresh: true } });
+
+  /* Søren, 23 Nov: the closed cases come in one by one as they scroll into view: 16 px up and fading in, 100 ms apart, once */
+  (function () {
+    var rows = Array.prototype.filter.call(document.querySelectorAll('.partner'), function (p) { return !p.classList.contains('open'); });
+    gsap.set(rows, { autoAlpha: 0, y: 16 });
+    ScrollTrigger.batch(rows, { start: 'top 92%', once: true, onEnter: function (b) {
+      gsap.to(b, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out', stagger: 0.1, overwrite: true, clearProps: 'transform,opacity,visibility' });
+    } });
+  })();
 
   /* chapter 02: each photo moves at its own speed while the collage scrolls under the header (data-speed: 1 = with the page, above 1 = faster) */
   /* mobile collage, Figma 72:144-72:153 (390 px units): the two people big at the top, the partner lines, then three small photos */
