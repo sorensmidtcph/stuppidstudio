@@ -316,6 +316,7 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* Søren, 24 Nov (9): the two photos in chapter 04 on the grid: the large one spans columns 1-4, the small one columns 8-9. Heights follow the old proportions */
 .rail-right .ch4-imgs .a { left: var(--rail-x, 85px); width: calc(4 * var(--gs) - 24px); height: auto; aspect-ratio: 414 / 485; }
 .rail-right .ch4-imgs .b { left: calc(var(--rail-x, 85px) + 7 * var(--gs)); width: calc(2 * var(--gs) - 24px); height: auto; aspect-ratio: 192 / 225; }
+.rail-right .ch4-imgs { height: max(calc(552px * var(--s)), calc((4 * var(--gs) - 24px) * 485 / 414 + 60px), calc(327px * var(--s) + (2 * var(--gs) - 24px) * 225 / 192 + 60px)); } /* Søren, 24 Nov (18): the block grows with its photos (+60 px for the parallax), so "Vores ambitioner i praksis" keeps its air under the large photo on wide windows */
 .rail-right .scroll-hint { right: calc(var(--line-r) + 30px); bottom: calc(21px - 9px + env(safe-area-inset-bottom, 0px)); }
 /* design grid, switched on and off with the Grid button bottom left, the G key or ?grid=on (Søren, 24 Nov) */
 .grid-ov { position: fixed; inset: 0; z-index: 190; pointer-events: none; display: none; }
@@ -1712,6 +1713,8 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   sheetHead.querySelector('h2').removeAttribute('id');
   sheetHead.setAttribute('aria-hidden', 'true');
   $('whiteSheet').appendChild(sheetHead);
+  /* Søren, 24 Nov (17): the header's label, statement and text fade in and rise 40 px while the sheet comes up, like the other chapter headers */
+  tl.fromTo(sheetHead.querySelectorAll('.ch1-label, .ch1-statement, .ch1-body'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.1, ease: 'power2.out', immediateRender: true }, 6.5);
   /* and a copy of the first challenge under it, which fades up while the sheet is on its last stretch */
   var sheetCh = document.querySelector('#acc .challenge').cloneNode(true);
   Array.prototype.forEach.call(sheetCh.querySelectorAll('[id]'), function (el) { el.removeAttribute('id'); });
@@ -1848,6 +1851,8 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   var head2 = document.querySelector('#ch2 .ch1-head').cloneNode(true);
   head2.querySelector('h2').removeAttribute('id');
   $('whiteSheet2').appendChild(head2);
+  /* Søren, 24 Nov (17): the same fade and rise on chapter 02's header while its sheet comes up */
+  tl2.fromTo(head2.querySelectorAll('.ch1-label, .ch1-statement, .ch1-body'), { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.08, ease: 'power2.out', immediateRender: true }, 4.4);
   /* handover on the real scroll position: chapter 02 lies right under the white sheet when this scene ends */
   ScrollTrigger.create({ trigger: '#scene2', start: 'bottom bottom',
     onEnter: function () {
@@ -1923,15 +1928,25 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     var phs = {}; Array.prototype.forEach.call(document.querySelectorAll('#collage .ph'), function (ph) { var m = ph.querySelector('img, video'); phs[m.getAttribute('src')] = ph; });
     var c1 = phs['collage-1.jpg'], vid = phs['collage-3.mp4'], c5 = phs['collage-5.jpg'];
     if (!run || !c1 || !vid || !c5) return;
-    if (!right) { run.style.top = ''; vid.style.top = '810px'; c5.style.top = '1004px'; col.style.height = ''; return; }
-    var d = Math.max(0, 41 + parseFloat(c1.style.height) + 136 - 532);
-    run.style.top = (532 + d) + 'px'; vid.style.top = (810 + d) + 'px'; c5.style.top = (1004 + d) + 'px';
+    if (!right) { run.style.top = ''; vid.style.top = '810px'; c5.style.top = '1004px'; col.style.height = ''; col.style.marginBottom = ''; var pt = document.querySelector('.ch2 .partners'); if (pt) pt.style.marginTop = ''; return; }
+    var d = Math.max(0, 41 + parseFloat(c1.style.height) + 136 - 532), top = 532 + d;
+    run.style.top = top + 'px'; vid.style.top = (810 + d) + 'px'; c5.style.top = (1004 + d) + 'px';
     var low = Math.max(810 + d + parseFloat(vid.style.height), 1004 + d + parseFloat(c5.style.height));
-    col.style.height = ((Math.max(1593, low + 150) + 100) * sc) + 'px'; /* + 100: more air between the last photo and "Det Kongelige Akademi i praksis" (Søren, 24 Nov) */
+    var colH = (Math.max(1593, low + 150) + 100) * sc; /* + 100: more air between the last photo and "Det Kongelige Akademi i praksis" (Søren, 24 Nov) */
+    col.style.height = colH + 'px';
+    /* Søren, 24 Nov (15): the sticky intro lets go when the partner lines are 134 units under the intro text, the same air as from the lines down to the film.
+       The collage's negative bottom margin sets that moment; the partners block gets the same amount back, so it still starts right under the photos */
+    var head = document.querySelector('#ch2 .ch1-head'), body = head && head.querySelector('.ch1-body'), partners = document.querySelector('.ch2 .partners');
+    if (head && body && partners) {
+      var P = head.offsetHeight - body.offsetTop - body.offsetHeight; /* from the intro text's last line to the bottom of the intro block */
+      var keep = colH - (top * sc + P - 134 * sc);
+      col.style.marginBottom = -keep + 'px'; partners.style.marginTop = keep + 'px';
+    }
     if (window.ScrollTrigger) requestAnimationFrame(function () { ScrollTrigger.refresh(); });
   }
   placeCollage();
   window.addEventListener('resize', function () { requestAnimationFrame(placeCollage); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measureCh2(); placeCollage(); });
   Array.prototype.forEach.call(document.querySelectorAll('#collage .ph'), function (ph) {
     var sp = parseFloat(ph.dataset.speed) || 1;
     if (sp === 1) return;
@@ -1999,6 +2014,14 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   gsap.fromTo('.ch3-big video', { yPercent: -13 }, { yPercent: 0, ease: 'none', scrollTrigger: { trigger: '.ch3-big', start: 'top bottom', end: 'bottom top', scrub: 1 } });
   Array.prototype.forEach.call(document.querySelectorAll('.ch3 .ch1-statement, .ch3 .ch1-body'), function (el) {
     gsap.from(el, { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' } });
+  });
+  /* Søren, 24 Nov (16): the same reveal on the other headings and content further down: labels, the partners heading, the big film and the call-to-action buttons
+     fade in and rise 40 px from below; the discipline cards and the chapter 04 photos already move with the scroll, so they only fade in */
+  Array.prototype.forEach.call(document.querySelectorAll('.ch3 .ch1-label, .ch4 .ch1-label, .partners-title, .ch3-big, .cta-btns'), function (el) {
+    gsap.from(el, { autoAlpha: 0, y: 40, duration: 0.9, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none reverse' } });
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('.ch3-disc figure, .ch4-imgs figure'), function (el, i) {
+    gsap.from(el, { autoAlpha: 0, duration: 0.9, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 92%', toggleActions: 'play none none reverse' } });
   });
 
   /* ---------- white chapter elements while the orange table is in view: read off the timelines as they actually play (scrub included) ---------- */
