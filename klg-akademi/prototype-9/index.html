@@ -1399,13 +1399,17 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     function paintRail() { fill.style.setProperty('--p', Math.min(1, Math.max(0, window.scrollY / max)).toFixed(4)); }
     /* Søren, 20 Nov: at the call to action the rail and the arrow slide in under it: both are cut off at its top edge */
     var ctaEl = document.getElementById('cta'), cta = document.getElementById('ch4'), railEl = fill.parentNode, nb = document.getElementById('nextBtn');
+    /* Søren, 24 Nov (19, performance): all measuring first, then writing, and only what changed, so a scroll event never forces a second layout */
+    var lastVis, lastRail, lastNb;
     function tuckUnder() {
-      var top = cta.getBoundingClientRect().bottom, /* where the white page ends and the call to action shows */ cut = Math.max(0, window.innerHeight - top);
+      var top = cta.getBoundingClientRect().bottom, /* where the white page ends and the call to action shows */ nbBottom = nb.getBoundingClientRect().bottom, ih = window.innerHeight, cut = Math.max(0, ih - top);
       var c = cut > 0 ? 'inset(0 -2px ' + cut + 'px -2px)' : ''; /* -2px at the sides: room for the 3 px scroll line */
       /* the pinned call to action only exists once the white page's bottom edge is in the window; before that it would show through the scenes above */
-      ctaEl.style.visibility = top < window.innerHeight + 2 ? '' : 'hidden';
-      railEl.style.clipPath = c;
-      var nr = nb.getBoundingClientRect(); nb.style.clipPath = cut > 0 ? 'inset(0 0 ' + Math.max(0, nr.bottom - top) + 'px 0)' : '';
+      var vis = top < ih + 2 ? '' : 'hidden';
+      var nc = cut > 0 ? 'inset(0 0 ' + Math.max(0, nbBottom - top) + 'px 0)' : '';
+      if (vis !== lastVis) { ctaEl.style.visibility = vis; lastVis = vis; }
+      if (c !== lastRail) { railEl.style.clipPath = c; lastRail = c; }
+      if (nc !== lastNb) { nb.style.clipPath = nc; lastNb = nc; }
     }
     window.addEventListener('scroll', tuckUnder, { passive: true }); window.addEventListener('resize', tuckUnder); tuckUnder();
     measureMax(); paintRail();
@@ -1593,6 +1597,11 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   window.addEventListener('scroll', moving, { passive: true });
   root.classList.add('is-moving');
   var intro = gsap.timeline({ paused: true, onComplete: moving });
+  /* Søren, 24 Nov (19, performance): the box's rise and fade are written straight onto the world, not as --rise/--fade on <html>.
+     A variable on the root is inherited, so every frame recalculated the style of the whole page while it was still loading */
+  var introFade = { r: 240, f: 0 };
+  function paintIntro() { world.style.translate = '0 ' + introFade.r + 'px'; world.style.opacity = introFade.f; }
+  paintIntro();
   (function () {
     var started = false;
     function go() { if (started) return; started = true; intro.play(0); }
@@ -1606,7 +1615,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     .from(railRight ? [rail, '#nextBtn'] : {}, { x: function () { return window.innerWidth - document.getElementById('nextBtn').getBoundingClientRect().left + 2; }, duration: 0.9, ease: 'power3.out' }, 1.5) /* Søren, 24 Nov: on desktop the line and the arrow come in from the right */
     .from(isM ? '#nextBtn' : {}, { autoAlpha: 0, duration: 0.6, ease: 'power1.out', immediateRender: true }, 1.5) /* 23 Nov: on mobile the arrow sits in the middle and can't slide in from the left, so it showed on the white cover; it fades in instead */ /* comes in once the box is in place; the small chapter lines ride along with it */
   /* then the box comes up from below, fading in on the way, and the arrows draw themselves */
-    .fromTo(root, { '--rise': 240, '--fade': 0 }, { '--rise': 0, '--fade': 1, duration: 1.4, ease: 'power3.out', immediateRender: true }, 0.35) /* starts while the background is still coming down */
+    .fromTo(introFade, { r: 240, f: 0 }, { r: 0, f: 1, duration: 1.4, ease: 'power3.out', immediateRender: true, onUpdate: paintIntro }, 0.35) /* starts while the background is still coming down */
     .to(card00.querySelectorAll('mask .draw'), { strokeDashoffset: 0, duration: 1.4, ease: 'power2.inOut' }, 0.65)
   /* the arrow comes in once the box has landed */
     ;
@@ -2048,7 +2057,12 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
 
   /* ---------- the "next" arrow: scrolls on to the next resting point of the experience; at the last one it turns and goes back to the top ---------- */
   function docTop(el) { return el.getBoundingClientRect().top + window.scrollY; }
-  function stops() {
+  /* Søren, 24 Nov (19, performance): the stops are measured once and kept until the layout changes (refresh, resize), not on every scroll event */
+  var stopsCache = null;
+  function stops() { if (!stopsCache) stopsCache = measureStops(); return stopsCache; }
+  ScrollTrigger.addEventListener('refresh', function () { stopsCache = null; });
+  window.addEventListener('resize', function () { stopsCache = null; });
+  function measureStops() {
     var hh = header.offsetHeight, st2 = tl2.scrollTrigger, list = [];
     list.push(scrollFor(tableT));                                   /* the four cards on the table */
     list.push(scrollFor(5.0));                                      /* Udfordringer on the left with its text */
@@ -2072,7 +2086,8 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   }
   var nextBtn = $('nextBtn');
   function nextStop() { var y = window.scrollY, l = stops(); for (var i = 0; i < l.length; i++) if (l[i] > y + 8) return l[i]; return null; }
-  function markNext() { var last = nextStop() === null; nextBtn.classList.toggle('to-top', last); nextBtn.setAttribute('aria-label', last ? 'Tilbage til toppen' : 'Næste del'); }
+  var lastNext = null;
+  function markNext() { var last = nextStop() === null; if (last === lastNext) return; lastNext = last; nextBtn.classList.toggle('to-top', last); nextBtn.setAttribute('aria-label', last ? 'Tilbage til toppen' : 'Næste del'); }
   /* footer "To top": back to the cards on the table with the fade, like the arrow at the end (23 Nov) */
   document.getElementById('toTop').addEventListener('click', function (e) { e.preventDefault(); jumpTo(scrollFor(tableT)); });
   nextBtn.addEventListener('click', function () {
