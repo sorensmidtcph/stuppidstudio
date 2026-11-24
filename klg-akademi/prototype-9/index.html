@@ -1917,6 +1917,18 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       var x0 = rx + (c[0] - 1) * gs, x1 = rx + c[1] * gs - 24, w = (x1 - x0) / sc;
       ph.style.left = ((x0 - origin) / sc) + 'px'; ph.style.width = w + 'px'; ph.style.height = (w * oh / ow) + 'px';
     });
+    /* Søren, 24 Nov (14): on wide windows the photos grow with the columns, so the partner lines and the photos under them move down
+       to keep the old air: 136 units between the top-right photo and the lines, the rest of the collage follows, and the collage grows to match */
+    var run = document.querySelector('#collage .partner-run'), col = document.getElementById('collage');
+    var phs = {}; Array.prototype.forEach.call(document.querySelectorAll('#collage .ph'), function (ph) { var m = ph.querySelector('img, video'); phs[m.getAttribute('src')] = ph; });
+    var c1 = phs['collage-1.jpg'], vid = phs['collage-3.mp4'], c5 = phs['collage-5.jpg'];
+    if (!run || !c1 || !vid || !c5) return;
+    if (!right) { run.style.top = ''; vid.style.top = '810px'; c5.style.top = '1004px'; col.style.height = ''; return; }
+    var d = Math.max(0, 41 + parseFloat(c1.style.height) + 136 - 532);
+    run.style.top = (532 + d) + 'px'; vid.style.top = (810 + d) + 'px'; c5.style.top = (1004 + d) + 'px';
+    var low = Math.max(810 + d + parseFloat(vid.style.height), 1004 + d + parseFloat(c5.style.height));
+    col.style.height = ((Math.max(1593, low + 150) + 100) * sc) + 'px'; /* + 100: more air between the last photo and "Det Kongelige Akademi i praksis" (Søren, 24 Nov) */
+    if (window.ScrollTrigger) requestAnimationFrame(function () { ScrollTrigger.refresh(); });
   }
   placeCollage();
   window.addEventListener('resize', function () { requestAnimationFrame(placeCollage); });
