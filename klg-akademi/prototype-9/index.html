@@ -316,6 +316,8 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 /* Søren, 24 Nov (9): the two photos in chapter 04 on the grid: the large one spans columns 1-4, the small one columns 8-9. Heights follow the old proportions */
 .rail-right .ch4-imgs .a { left: var(--rail-x, 85px); width: calc(4 * var(--gs) - 24px); height: auto; aspect-ratio: 414 / 485; }
 .rail-right .ch4-imgs .b { left: calc(var(--rail-x, 85px) + 7 * var(--gs)); width: calc(2 * var(--gs) - 24px); height: auto; aspect-ratio: 192 / 225; }
+.rail-right .ch2 .ch1-head { position: relative; top: auto; }
+.rail-right.is-scrolly .collage { margin-top: max(0px, calc(100vh - var(--hh) - var(--ch2-head, 600px) - 160px)); } /* Søren, 27 Nov: at the chapter 02 view the top photos rise a little further up from the bottom (room for 160 px, was 90) */ /* Søren, 27 Nov: chapter 02's intro scrolls up with the page instead of standing still while the photos come up over it */
 .rail-right .ch4-imgs { height: max(calc(552px * var(--s)), calc((4 * var(--gs) - 24px) * 485 / 414 + 60px), calc(327px * var(--s) + (2 * var(--gs) - 24px) * 225 / 192 + 60px)); } /* Søren, 24 Nov (18): the block grows with its photos (+60 px for the parallax), so "Vores ambitioner i praksis" keeps its air under the large photo on wide windows */
 .rail-right .scroll-hint { right: calc(var(--line-r) + 30px); bottom: calc(21px - 9px + env(safe-area-inset-bottom, 0px)); }
 /* design grid, switched on and off with the Grid button bottom left, the G key or ?grid=on (Søren, 24 Nov) */
@@ -403,6 +405,21 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .ico-plus { flex: none; margin-left: 16px; } /* Søren, 23 Nov: a two-line case title squeezed the plus smaller; now it keeps its 24 px */
 .ico-plus .v { transform-box: fill-box; transform-origin: center; transition: transform .3s var(--ease); }
 .partner.open .ico-plus .v { transform: scaleY(0); } /* plus turns into minus */
+/* Søren, 27 Nov: the fold-out bars use the site's own arrow (the same drawn arrow as the pager), pointing down; it turns to point up when the case is open */
+.ico-arrow { width: 24px; height: 20px; transition: rotate .3s var(--ease); }
+.partner.open .ico-arrow { rotate: 180deg; }
+/* Søren, 27 Nov: a clearer invitation to scroll. "Scroll for at udforske" moves from the corner to the middle under the cards on the table,
+   with a thin line under it that draws itself downwards in a calm loop. It still shows when the cards have landed and leaves as soon as the reader scrolls on.
+   Desktop and tablet; on mobile the arrow under the box does this job */
+.rail-right .scroll-hint, .scroll-hint.cue { right: auto; left: calc(var(--line-x, 100vw) / 2); bottom: calc(10px + env(safe-area-inset-bottom, 0px)); translate: -50% 0; }
+.scroll-hint #scrollHintIn { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.scroll-hint i { display: block; width: 1px; height: 30px; background: currentColor; transform-origin: 50% 0; animation: cueLine 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+@keyframes cueLine { 0% { transform: scaleY(0); transform-origin: 50% 0; } 45% { transform: scaleY(1); transform-origin: 50% 0; } 55% { transform: scaleY(1); transform-origin: 50% 100%; } 100% { transform: scaleY(0); transform-origin: 50% 100%; } }
+@media (prefers-reduced-motion: reduce) { .scroll-hint i { animation: none; } }
+.m .scroll-hint.m-cue { display: block !important; position: absolute; left: 50%; right: auto; bottom: auto; translate: -50% 0; z-index: 9; }
+.m .scroll-hint.m-cue #scrollHintIn { gap: 8px; }
+.m .scroll-hint.m-cue i { height: 18px; }
+.m .next-btn { display: none !important; } /* Søren, 27 Nov: no arrow under the box on mobile; the scroll invitation under the text does that job */
 /* Søren, 23 Nov: as tall as a challenge (the window under the site header and the tab), with the same photo width and text column, mirrored: photo left, text right */
 .partners { --ph: max(560px, calc(100vh - var(--hh, 85px) - 72px)); }
 .partner-panel { display: grid; grid-template-columns: minmax(0, 1fr) min(582px, 42%); grid-template-rows: calc(var(--ph) - 1px); align-content: start; height: var(--ph); border-top: 1px solid var(--ink); }
@@ -923,7 +940,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { requestAnimationFrame(draw); });
 })();
 </script>
-<p class="scroll-hint" id="scrollHint" aria-hidden="true"><span id="scrollHintIn">Scroll for at udforske</span></p>
+<p class="scroll-hint" id="scrollHint" aria-hidden="true"><span id="scrollHintIn"><span>Scroll for at udforske</span><i></i></span></p>
 <div class="rail" aria-hidden="true"><div class="rail-fill" id="railFill"></div></div>
 <nav class="chapters" aria-label="Kapitler">
   <ol>
@@ -946,7 +963,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
 
       <p class="eyebrow hero">Strategi 2026-2030</p>
       <h1 class="title hero">Kortene på bordet</h1>
-      <p class="lead hero">Hvilke samfundsudfordringer brænder vi for at løse? Hvem samarbejder vi med, og hvilket aftryk vil vi sætte? Træd inden for i vores strategi, og se, hvordan vi spiller vores&nbsp;kort.</p>
+      <p class="lead hero">Hvilket aftryk vil Det Kongelige Akademi sætte? Hvem samarbejder vi med, og hvilke samfundsudfordringer brænder vi for at løse? Træd inden for i vores strategi, og se, hvordan vi spiller vores strategiske&nbsp;kort.</p>
 
       <div class="box" id="box" aria-label="Strategiæsken">
         <div class="lid-shadow lidpart"></div>
@@ -1001,7 +1018,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
 <section class="ch1" id="ch1" aria-labelledby="ch1Statement">
   <div class="ch1-head">
     <p class="ch1-label">Udfordringer</p>
-    <h2 class="ch1-statement" id="ch1Statement">Verden er i opbrud. Klimaet forandrer sig, magtbalancerne forskydes, og teknologien har igen skubbet os ind i et nyt paradigme</h2>
+    <h2 class="ch1-statement" id="ch1Statement">Verden er i opbrud. Klimaet forandrer sig, magtbalancerne forskydes, velfærdssamfundet udfordres, og teknologien har igen skubbet os ind i et nyt paradigme</h2>
     <p class="ch1-body">På Det Kongelige Akademi står vi midt i det hele – nysgerrige, lydhøre og med hænderne i materialet.</p>
   </div>
   <div class="challenges" id="acc">
@@ -1010,7 +1027,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       <div class="case">
         <div class="case-text">
           <h4 class="case-title">Tiden tærer på vores kulturarv</h4>
-          <p class="case-body">Svingende luftfugtighed og temperatur får maling til at slå revner og arkæologisk træ til at give efter. Hvordan kan vi bevare arven på en bæredygtig måde?</p>
+          <p class="case-body">Svingende luftfugtighed og temperatur får maling til at slå revner og arkæologisk træ til at give efter. Vi arbejder for at bevare arven på en bæredygtig måde.</p>
         </div>
         <div class="case-img" aria-hidden="true"><video src="case-01.mp4" autoplay muted loop playsinline preload="auto"></video></div>
       </div>
@@ -1021,7 +1038,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       <div class="case">
         <div class="case-text">
           <h4 class="case-title">Hvordan skal vi bo som gamle?</h4>
-          <p class="case-body">Hver femte dansker er i dag over 65 år, og mange bliver gamle i boliger, der ikke er tegnet til det. Denne debatbog undersøger udfordringerne – og oplagte løsninger.</p>
+          <p class="case-body">Hver femte dansker er i dag over 65 år, og mange bliver gamle i boliger, der ikke er indrettet til det. Vi har udgivet en bog med løsninger, der er til at bygge videre på.</p>
         </div>
         <div class="case-img"><img src="case-02.jpg" alt="Fælleskøkken med blå køkkenelementer, hvor ældre beboere laver mad sammen"></div>
       </div>
@@ -1032,7 +1049,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       <div class="case">
         <div class="case-text">
           <h4 class="case-title">Byggeriets madpyramide</h4>
-          <p class="case-body">Alle kender kostpyramiden. Men kan vi lave noget tilsvarende for byggeriet? Ja! Se her, hvilke materialer vi skal bygge med, hvis vi vil bo og bygge sundt.</p>
+          <p class="case-body">Alle kender kostpyramiden. Vi har lavet en tilsvarende for byggeriet, som viser de materialer, vi skal bygge med, hvis vi vil bo og bygge sundt.</p>
         </div>
         <div class="case-img" aria-hidden="true"><video class="play-in-view" src="case-03.mp4" poster="case-03-poster.jpg" muted loop playsinline preload="metadata"></video></div>
       </div>
@@ -1071,7 +1088,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   <div class="partners" id="partners">
     <h2 class="partners-title">Det Kongelige Akademi i praksis</h2>
     <div class="partner open">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb1" aria-expanded="true" aria-controls="pp1">Patienttøj med fornuft og følelse<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb1" aria-expanded="true" aria-controls="pp1">Patienttøj med fornuft og følelse<svg class="ico-plus ico-arrow" width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true"><path d="M8 1V18.5M1 11.5L8 18.5L15 11.5" stroke="currentColor" stroke-width="1.5"/></svg></button></h3>
       <div class="partner-panel" id="pp1" role="region" aria-labelledby="pb1">
         <div class="partner-media" aria-hidden="true">
           <div class="step-media on"><img src="chi-1.jpg" alt="En sundhedsprofessionel viser to studerende i operationstøj et instrument"></div>
@@ -1097,7 +1114,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       </div>
     </div>
     <div class="partner">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb2" aria-expanded="false" aria-controls="pp2">Design og arkitektur med iværksætterånd<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb2" aria-expanded="false" aria-controls="pp2">Design og arkitektur med iværksætterånd<svg class="ico-plus ico-arrow" width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true"><path d="M8 1V18.5M1 11.5L8 18.5L15 11.5" stroke="currentColor" stroke-width="1.5"/></svg></button></h3>
       <div class="partner-panel" id="pp2" role="region" aria-labelledby="pb2" hidden>
         <div class="partner-media" aria-hidden="true">
           <div class="step-media on"><img src="iv-1.jpg" alt="En person bøjer en gren til en prototype (Startup Hub, REACT)"></div>
@@ -1124,7 +1141,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       </div>
     </div>
     <div class="partner">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb3" aria-expanded="false" aria-controls="pp3">Arkitektur uden benspænd<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb3" aria-expanded="false" aria-controls="pp3">Arkitektur uden benspænd<svg class="ico-plus ico-arrow" width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true"><path d="M8 1V18.5M1 11.5L8 18.5L15 11.5" stroke="currentColor" stroke-width="1.5"/></svg></button></h3>
       <div class="partner-panel" id="pp3" role="region" aria-labelledby="pb3" hidden>
         <div class="partner-media" aria-hidden="true">
           <div class="step-media on"><img src="ben-1.jpg" alt="Tre personer går på en sti, den midterste i en dragt, der simulerer nedsat syn og bevægelighed"></div>
@@ -1151,7 +1168,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       </div>
     </div>
     <div class="partner">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb4" aria-expanded="false" aria-controls="pp4">Huse mod malaria<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb4" aria-expanded="false" aria-controls="pp4">Huse mod malaria<svg class="ico-plus ico-arrow" width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true"><path d="M8 1V18.5M1 11.5L8 18.5L15 11.5" stroke="currentColor" stroke-width="1.5"/></svg></button></h3>
       <div class="partner-panel" id="pp4" role="region" aria-labelledby="pb4" hidden>
         <div class="partner-media" aria-hidden="true">
           <div class="step-media on"><img src="mal-1.jpg" alt="Landsbygade i Mtwara, Tanzania, med Star Homes mellem palmer"></div>
@@ -1178,7 +1195,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       </div>
     </div>
     <div class="partner">
-      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb5" aria-expanded="false" aria-controls="pp5">Havet som byggeklods<svg class="ico-plus" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path class="v" d="M12 1v22"/><path d="M1 12h22"/></svg></button></h3>
+      <h3 class="partner-h"><button type="button" class="partner-btn" id="pb5" aria-expanded="false" aria-controls="pp5">Havet som byggeklods<svg class="ico-plus ico-arrow" width="16" height="20" viewBox="0 0 16 20" fill="none" aria-hidden="true"><path d="M8 1V18.5M1 11.5L8 18.5L15 11.5" stroke="currentColor" stroke-width="1.5"/></svg></button></h3>
       <div class="partner-panel" id="pp5" role="region" aria-labelledby="pb5" hidden>
         <div class="partner-media" aria-hidden="true">
           <div class="step-media on"><img src="hav-1.jpg" alt="En hånd holder en tynd algefilm op mod lyset"></div>
@@ -1270,14 +1287,13 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     <li><p class="amb-n" aria-hidden="true">1</p><div class="amb-t"><h4 class="amb-tt">Vi har en klar plads – og vi bruger den</h4><p class="amb-b">I dansk uddannelse og forskning har vi en unik position. Vi bygger videre på generationers viden om arkitektur, design og konservering og sætter den kunstneriske metode i samtale med forskningen.</p></div></li>
     <li><p class="amb-n" aria-hidden="true">2</p><div class="amb-t"><h4 class="amb-tt">Vi rækker ud over landets grænser</h4><p class="amb-b">Vores uddannelser er anerkendt internationalt, og vores forskning krydser fag og landegrænser. Det åbner døre for både studerende, forskere og samarbejdspartnere.</p></div></li>
     <li><p class="amb-n" aria-hidden="true">3</p><div class="amb-t"><h4 class="amb-tt">Vi tager fat på de store opgaver – sammen med andre</h4><p class="amb-b">Med borgere og førende aktører i og omkring vores fag arbejder vi med samfundets helt store udfordringer. Vi skaber løsninger, der virker og giver mening for dem, der skal bruge dem.</p></div></li>
-    <li><p class="amb-n" aria-hidden="true">4</p><div class="amb-t"><h4 class="amb-tt">Vi gør en mærkbar forskel</h4><p class="amb-b">Vores samarbejder viser, hvad arkitektur, design og konservering kan betyde for mennesker og samfund. Vores kandidater og medarbejdere bærer ny viden videre ind i virksomheder og organisationer og flytter den praksis, de træder ind i.</p></div></li>
+    <li><p class="amb-n" aria-hidden="true">4</p><div class="amb-t"><h4 class="amb-tt">Vi gør en mærkbar forskel</h4><p class="amb-b">Vores samarbejder viser, hvad arkitektur, design og konservering kan betyde for borgere og samfund. Vores kandidater og medarbejdere bærer ny viden videre ind i virksomheder og organisationer og flytter den praksis, de træder ind i.</p></div></li>
   </ol>
 </section>
 
 <section class="cta" id="cta" aria-labelledby="ctaH">
   <h2 class="cta-h" id="ctaH">Ingen skaber forandringer alene. Har du en udfordring, vi skal løse sammen?</h2>
   <div class="cta-btns">
-    <a class="cta-fill" href="#" data-href="/da/kontakt">Kontakt os om samarbejde →</a>
     <a class="cta-box" href="#" data-href="/da/strategi.pdf">Download strategi →</a>
   </div>
 </section>
@@ -1430,7 +1446,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     ];
     function filler(title) { return [['Partner × KADK', title, 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante venenatis dapibus, posuere velit aliquet.']].concat(lorem); }
     var data = {
-      pp1: [["Udfordring", "Patienttøj med fornuft og følelse", "Patienttøj kan føles uværdigt og er ikke bæredygtigt. Hvordan gør vi det bedre og mere bæredygtigt for unge med mange og lange forløb i sundhedsvæsenet?"], ["Aktører", "", "Copenhagen Health Innovation og studerende på Det Kongelige Akademi – Torstein Persson, Freya Quvang, Rosa Nørregaard Fenger og Alberte Meyer."], ["Metode", "", "Den kunstneriske metode vægter sanselighed lige så højt som det praktiske. Gennem observation og samtaler udviklede de studerende prototyper, afprøvede tekstilprøver og fik løbende feedback fra brugere med nedsat syn og hyppige indlæggelser."], ["Løsning", "", "Blødt, genanvendeligt patienttøj med tydelige kontraster og taktile kvaliteter, der gør det lettere at orientere sig i tøjet og tage det på."]], /* texts from Søren, 23 Nov */
+      pp1: [["Udfordring", "Patienttøj med fornuft og følelse", "Patienttøj kan føles uværdigt og er ikke bæredygtigt. Hvordan gør vi det bedre og mere bæredygtigt for unge med mange og lange forløb i sundhedsvæsenet?"], ["Aktører", "", "Region Hovedstaden/Region Østdanmark og studerende på Det Kongelige Akademi – Torstein Persson, Freya Quvang, Rosa Nørregaard Fenger og Alberte Meyer."], ["Metode", "", "Den kunstneriske metode vægter sanselighed lige så højt som det praktiske. Gennem observation og samtaler udviklede de studerende prototyper, afprøvede tekstilprøver og fik løbende feedback fra brugere med nedsat syn og hyppige indlæggelser."], ["Løsning", "", "Blødt, genanvendeligt patienttøj med tydelige kontraster og taktile kvaliteter, der gør det lettere at orientere sig i tøjet og tage det på."]], /* texts from Søren, 23 Nov */
       pp2: [["Udfordring", "Design og arkitektur med iværksætterånd", "Bæredygtighed kræver nye produkter, men også nye forretninger, der kan bære dem. Hvordan skaber vi en uddannelse, der klæder morgendagens designere og arkitekter på til at skabe begge dele?"], ["Aktører", "", "Det Kongelige Akademi og Copenhagen Business School i samarbejde samt eksterne samarbejdspartnere, bl.a. DSB, Mary Elizabeths Hospital og Gehl Archictects."], ["Metode", "", "Uddannelsen er bygget op om projektbaserede forløb, hvor studerende fra Det Kongelige Akademi og CBS arbejder i grupper med reelle udfordringer fra virksomheder og organisationer. Her udvikler de konkrete løsninger, hvor cirkulære materialer og bæredygtige forretningsmodeller går hånd i hånd."], ["Resultater", "", "En ny generation af kandidater, der bygger bro mellem design, arkitektur og forretning. De omsætter bæredygtighed til holdbare produkter og forretninger og skaber løsninger på samfundsmæssige udfordringer."]],
       pp3: [["Udfordring", "Arkitektur uden benspænd", "Mennesker med handicap har sjældent de samme muligheder for at deltage i samfundet – hverken i byens rum, i kulturlivet eller i deres egen bolig. Hvordan sikrer vi, at arkitekter og designere lærer at skabe omgivelser, hvor alle kan være med?"], ["Aktører", "", "Det Kongelige Akademi i et femårigt partnerskab med Bevica Fonden, Rambøll Fonden og Dreyers Fond, i tæt samarbejde med borgere, civilsamfund og eksperter på fagområdet."], ["Metode", "", "Gennem uddannelse, forskning og efteruddannelse arbejder vi med universelt design. Arbejdet spænder fra transformation af historiske bygninger, boliger og byrum til inkluderende møbler, produkter og designprocesser."], ["Mål", "", "Arkitekter og designere, der kan skabe bygninger, byrum og produkter, som alle kan bruge, uanset om man ser, hører eller bevæger sig forskelligt. Samtidig får vi ny viden om, hvordan vi kan gøre eksisterende bygninger mere tilgængelige uden at miste deres historie."]],
       pp4: [["Udfordring", "Huse mod malaria", "Malaria, diarré og luftvejsinfektioner koster hvert år mange børneliv i Afrika syd for Sahara, og boligen spiller en stor rolle. Hvordan kan arkitektur hjælpe med at holde børn raske?"], ["Aktører", "", "Star Home er udviklet af Det Kongelige Akademi i samarbejde med et internationalt hold af læger, epidemiologer og sundhedsforskere fra Afrika, Europa og Asien, herunder CSK Research Solutions (Tanzania) og University of Oxford (UK)."], ["Metode", "", "Projektet forener arkitekter og sundhedsforskere og afspejler kriterierne fra begge fagområder. Huset er tegnet med fokus på lys, frisk luft og hverdagens behov, men det er også testet på samme måde, som man tester ny medicin."], ["Resultater", "", "I tre år fulgte forskerne børn i 110 huse i det sydlige Tanzania. Børnene fik 44 % mindre malaria, 30 % mindre diarré og 18 % færre luftvejsinfektioner. Samtidig er huset billigere at bygge og udleder langt mindre CO₂ end et traditionelt hus."]],
@@ -1643,7 +1659,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   if (isM) {
     /* Søren, 19 Nov: the cards gathered closer around the orange one, just under the lead text; on short screens the whole hand shrinks so more of it shows */
     var fM = function () { return Math.min(1, stage.clientHeight / 746); };
-    var oY = function () { return 346 + 160 * fM(); }; /* Søren, 20 Nov: the pile 16 px lower (was 330) */ /* centre of the orange card, screen px from the stage top */
+    var oY = function () { return 362 + 160 * fM(); }; /* Søren, 27 Nov: 16 px lower again (was 346), more air under the scroll invitation */ /* Søren, 20 Nov: the pile 16 px lower (was 330) */ /* centre of the orange card, screen px from the stage top */
     var dX = [-104, -70, 104, 74], dY = [10, 130, -12, 140];
     var mX = { length: 4 }, mY = { length: 4 };
     [0, 1, 2, 3].forEach(function (k) {
@@ -1671,9 +1687,12 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
       el.style.fontSize = (fs / k) + 'px'; el.style.lineHeight = lh; el.style.letterSpacing = (ls / k) + 'px'; el.style.whiteSpace = 'normal';
     };
     /* Søren, 20 Nov: the whole block 16 px higher */
-    put('.eyebrow', 40, 350, 12, '1.1', 0.5);
-    put('.title', 69, 350 * W / 390, 48, '1', -0.7);
-    put('.lead', 181, 336 * W / 390, 18, '1.3', 0);
+    put('.eyebrow', 24, 350, 12, '1.1', 0.5); /* Søren, 27 Nov: 16 px higher again, to make room for the scroll invitation under the text */
+    put('.title', 53, 350 * W / 390, 48, '1', -0.7);
+    put('.lead', 165, 336 * W / 390, 18, '1.3', 0);
+    /* Søren, 27 Nov: on mobile "Scroll for at udforske" with its drawing line sits under the text, before the cards; it lives in the stage so it stays with the text */
+    var hint = document.getElementById('scrollHint');
+    if (hint) { if (hint.parentNode !== stage) stage.appendChild(hint); hint.classList.add('m-cue'); hint.style.top = (165 + document.querySelector('.lead').offsetHeight * k + 18) + 'px'; }
   }
   placeHeroM(); window.addEventListener('resize', placeHeroM);
   gsap.set('.hero', { autoAlpha: 0, y: 40 });
@@ -1752,7 +1771,8 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     var pos = { y: window.scrollY };
     /* the full run from the top takes 3.2 s; a run from further down is shorter, but never under 1.2 s */
     var dur = Math.max(1.2, 3.2 * (to - pos.y) / Math.max(1, to - scrollFor(0)));
-    autoTw = gsap.to(pos, { y: to, duration: dur, ease: 'power2.out', /* starts at speed right away and slows down towards the table */ onUpdate: function () { window.scrollTo(0, pos.y); }, onComplete: function () { autoTw = null; gsap.to('#scrollHintIn', { opacity: 1, duration: 0.8, ease: 'power1.out' }); } });
+    autoTw = gsap.to(pos, { y: to, duration: dur, ease: 'power2.out', /* starts at speed right away and slows down towards the table */ onUpdate: function () { window.scrollTo(0, pos.y); }, onComplete: function () { autoTw = null; } });
+    gsap.to('#scrollHintIn', { opacity: 1, duration: 0.8, ease: 'power1.out', delay: dur * 0.45 }); /* Søren, 27 Nov: "Scroll for at udforske" comes on while the cards are still settling, not after (was: when the autoplay had finished) */
   }
   box.setAttribute('role', 'button');
   box.setAttribute('tabindex', '0');
@@ -2071,7 +2091,7 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
     list.push(docTop(acc) - (hh - 1));                              /* challenge 1 in place */
     for (var i = 0; i < gaps.length - 1; i++) list.push(docTop(gaps[i]) + gaps[i].offsetHeight - (hh - 1)); /* challenges 2 and 3 */
     list.push(st2.start + (3.3 / tl2.duration()) * (st2.end - st2.start)); /* card 02 on the table with its text */
-    list.push(st2.end);                                             /* chapter 02: header */
+    list.push(st2.end + 4); /* Søren, 27 Nov: a few px past the end, so chapter 02 has really landed (its photos rise up from the bottom) when a key or the arrow stops here */                                             /* chapter 02: header */
     list.push(docTop($('partners')) - header.offsetHeight);        /* chapter 02: the partner cases */
     list.push(tl3.scrollTrigger.end);                               /* card 03 Metode on the table */
     list.push(docTop($('ch3')) - header.offsetHeight);              /* chapter 04: header */
@@ -2091,14 +2111,41 @@ if (MOTION_V2) document.documentElement.classList.add('motion-v2');
   /* footer "To top": back to the cards on the table with the fade, like the arrow at the end (23 Nov) */
   document.getElementById('toTop').addEventListener('click', function (e) { e.preventDefault(); jumpTo(scrollFor(tableT)); });
   nextBtn.addEventListener('click', function () {
-    var to = nextStop();
-    stopAuto();
-    if (to === null) { jumpTo(scrollFor(tableT)); return; } /* Søren, 12 Nov: back to the cards on the table directly with a fade, like the chapter jumps */
-    var pos = { y: window.scrollY };
-    var dur = Math.min(2.4, Math.max(0.9, Math.abs(to - pos.y) / 1400));
-    autoTw = gsap.to(pos, { y: to, duration: dur, ease: 'power2.inOut', onUpdate: function () { window.scrollTo(0, pos.y); }, onComplete: function () { autoTw = null; markNext(); } });
+    var to = nextStopFrom();
+    if (to === null) { stopAuto(); jumpTo(scrollFor(tableT)); return; } /* Søren, 12 Nov: back to the cards on the table directly with a fade, like the chapter jumps */
+    glideTo(to);
   });
   window.addEventListener('scroll', function () { if (!autoTw) markNext(); }, { passive: true });
+  /* Søren, 27 Nov: presentation keys. Page Down, arrow down, arrow right and space go to the next view, like the arrow in the corner;
+     Page Up, arrow up, arrow left and shift + space go back one view. Presentation clickers send these keys */
+  /* Søren, 27 Nov: a press while the page is still gliding counts from where it is going, not from where it is now,
+     so a second press during a long glide (into an orange chapter) goes one view further instead of to the same view again */
+  var glideTarget = null, glideTw = null;
+  function fromY() { return (autoTw && autoTw === glideTw) ? glideTarget : window.scrollY; }
+  var keyBase = null; /* read before the page's other key listener stops the glide */
+  window.addEventListener('keydown', function (e) { if (/^(PageDown|PageUp|ArrowDown|ArrowUp|ArrowLeft|ArrowRight| )$/.test(e.key)) keyBase = fromY(); }, true);
+  function baseY() { var y = keyBase !== null ? keyBase : fromY(); keyBase = null; return y; }
+  function prevStop() { var y = baseY(), l = stops(); for (var i = l.length - 1; i >= 0; i--) if (l[i] < y - 8) return l[i]; return 0; }
+  function nextStopFrom() { var y = baseY(), l = stops(); for (var i = 0; i < l.length; i++) if (l[i] > y + 8) return l[i]; return null; }
+  function glideTo(to) {
+    stopAuto(); glideTarget = to;
+    var pos = { y: window.scrollY };
+    var dur = Math.min(2.4, Math.max(0.9, Math.abs(to - pos.y) / 1400));
+    autoTw = glideTw = gsap.to(pos, { y: to, duration: dur, ease: 'power2.inOut', onUpdate: function () { window.scrollTo(0, pos.y); }, onComplete: function () { autoTw = null; markNext(); } });
+  }
+  window.addEventListener('keydown', function (e) {
+    if (e.metaKey || e.ctrlKey || e.altKey || e.defaultPrevented) return;
+    var t = e.target, tag = t && t.tagName;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(tag) || (t && t.isContentEditable)) return;
+    if (document.querySelector('.ov.open')) return; /* the menu or search overlay is open */
+    var k = e.key, fwd = k === 'PageDown' || k === 'ArrowDown' || k === 'ArrowRight' || (k === ' ' && !e.shiftKey);
+    var back = k === 'PageUp' || k === 'ArrowUp' || k === 'ArrowLeft' || (k === ' ' && e.shiftKey);
+    if (!fwd && !back) return;
+    if (k === ' ' && (t === box || (t && t.closest && t.closest('button, a, [role="button"]')))) return; /* space on a button presses the button */
+    e.preventDefault();
+    if (fwd) { var to = nextStopFrom(); if (to !== null) glideTo(to); }
+    else glideTo(prevStop());
+  });
   markNext();
 
   /* ---------- mobile swipe (Søren, 19 Nov): inside the animated scenes one swipe plays on to the next resting point (or back to the previous one);
